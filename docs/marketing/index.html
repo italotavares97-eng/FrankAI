@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Estratégia de Conteúdo — Davvero Gelato</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0A0F1E;--card:#111827;--card2:#1E293B;--border:#1F2D3D;--text:#F1F5F9;--muted:#64748B;--muted2:#94A3B8;--primary:#1A56DB;--pl:#3B82F6;--success:#057A55;--sl:#34D399;--warning:#F59E0B;--danger:#E02424;--dl:#F87171;--accent:#8B5CF6;--al:#A78BFA;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.7;}
+    ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+    /* Nav */
+    nav{position:sticky;top:0;z-index:100;background:rgba(10,15,30,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:16px;height:56px;overflow-x:auto;}
+    nav a{color:var(--muted2);text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap;padding:6px 12px;border-radius:6px;transition:.2s;}
+    nav a:hover{color:var(--text);background:rgba(255,255,255,.06);}
+    .nav-brand{font-size:14px;font-weight:800;color:var(--pl);white-space:nowrap;margin-right:8px;}
+
+    /* Layout */
+    .wrap{max-width:1100px;margin:0 auto;padding:40px 32px;}
+    .hero{padding:60px 32px 40px;max-width:1100px;margin:0 auto;}
+    h1{font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:12px;}
+    .hero-sub{color:var(--muted2);font-size:16px;margin-bottom:32px;}
+    .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:16px;}
+    .tag-blue{background:rgba(26,86,219,.2);color:var(--pl);border:1px solid rgba(26,86,219,.3);}
+    .tag-green{background:rgba(5,122,85,.2);color:var(--sl);border:1px solid rgba(5,122,85,.3);}
+    .tag-purple{background:rgba(139,92,246,.2);color:var(--al);border:1px solid rgba(139,92,246,.3);}
+    .tag-amber{background:rgba(245,158,11,.2);color:var(--warning);border:1px solid rgba(245,158,11,.3);}
+    .tag-red{background:rgba(224,36,36,.2);color:var(--dl);border:1px solid rgba(224,36,36,.3);}
+
+    /* Sections */
+    .section{margin-bottom:64px;}
+    h2{font-size:clamp(20px,3vw,32px);font-weight:800;letter-spacing:-.02em;margin-bottom:8px;}
+    h3{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--pl);}
+    h4{font-size:15px;font-weight:700;margin-bottom:6px;}
+    p{color:var(--muted2);margin-bottom:12px;}
+
+    /* Cards */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;}
+    .card-grid{display:grid;gap:16px;}
+    .grid-2{grid-template-columns:repeat(2,1fr);}
+    .grid-3{grid-template-columns:repeat(3,1fr);}
+    .grid-4{grid-template-columns:repeat(4,1fr);}
+    @media(max-width:900px){.grid-3,.grid-4{grid-template-columns:1fr 1fr;}}
+    @media(max-width:600px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}}
+
+    /* KPI tiles */
+    .kpi{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:16px;}
+    .kpi .label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;}
+    .kpi .val{font-size:28px;font-weight:900;margin:4px 0 2px;}
+    .kpi .note{font-size:11px;color:var(--muted2);}
+    .ok{color:var(--sl);} .warn{color:var(--warning);} .bad{color:var(--dl);}
+
+    /* Tables */
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    th{background:rgba(26,86,219,.1);color:var(--pl);font-weight:700;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}
+    td{padding:9px 12px;border-bottom:1px solid rgba(31,45,61,.7);color:var(--muted2);}
+    td strong{color:var(--text);}
+    tr:hover td{background:rgba(255,255,255,.02);}
+
+    /* Badges */
+    .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
+    .b-ok{background:rgba(5,122,85,.2);color:var(--sl);}
+    .b-warn{background:rgba(245,158,11,.2);color:var(--warning);}
+    .b-bad{background:rgba(224,36,36,.2);color:var(--dl);}
+    .b-blue{background:rgba(26,86,219,.2);color:var(--pl);}
+    .b-purple{background:rgba(139,92,246,.2);color:var(--al);}
+
+    /* Flywheel */
+    .flywheel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-bottom:24px;}
+    .fw-ring{display:flex;gap:0;flex-wrap:wrap;justify-content:center;margin:24px 0;}
+    .fw-phase{flex:1;min-width:200px;padding:20px;margin:8px;border-radius:12px;transition:.2s;}
+    .fw-phase:hover{transform:scale(1.03);}
+    .fw-attract{background:rgba(26,86,219,.12);border:1px solid rgba(26,86,219,.3);}
+    .fw-engage{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);}
+    .fw-delight{background:rgba(5,122,85,.12);border:1px solid rgba(5,122,85,.3);}
+    .fw-advocate{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);}
+    .fw-icon{font-size:32px;margin-bottom:8px;}
+    .fw-title{font-size:16px;font-weight:800;margin-bottom:6px;}
+    .fw-sub{font-size:12px;color:var(--muted2);}
+    .fw-arrow{font-size:24px;color:var(--muted);align-self:center;margin:0 -4px;}
+
+    /* Groups */
+    .group-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+    .gtab{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;}
+    .gtab:hover{border-color:var(--pl);color:var(--pl);}
+    .gtab.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+    /* Timeline */
+    .timeline{position:relative;padding-left:32px;}
+    .timeline::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;background:var(--border);}
+    .tl-item{position:relative;padding-bottom:28px;}
+    .tl-dot{position:absolute;left:-32px;top:4px;width:22px;height:22px;border-radius:50%;border:2px solid var(--primary);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--pl);}
+    .tl-title{font-weight:700;font-size:14px;margin-bottom:4px;}
+    .tl-body{font-size:13px;color:var(--muted2);}
+    .tl-meta{font-size:10px;color:var(--muted);margin-top:4px;}
+
+    /* Platform cards */
+    .platform-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px;}
+    .platform-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+    .platform-icon{font-size:28px;}
+    .platform-name{font-size:16px;font-weight:800;}
+    .platform-goal{font-size:12px;color:var(--muted2);}
+    .content-example{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:10px;font-size:12px;line-height:1.6;color:var(--muted2);}
+    .content-example strong{color:var(--text);}
+
+    /* Progress bars */
+    .progress-wrap{margin-bottom:10px;}
+    .progress-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+    .progress-bar{background:var(--border);border-radius:999px;height:6px;overflow:hidden;}
+    .progress-fill{height:100%;border-radius:999px;transition:width 1s ease;}
+
+    /* Insight box */
+    .insight{background:linear-gradient(135deg,rgba(26,86,219,.15),rgba(139,92,246,.1));border:1px solid rgba(26,86,219,.3);border-radius:12px;padding:20px;margin-bottom:16px;}
+    .insight-icon{font-size:24px;margin-bottom:8px;}
+    .insight-title{font-size:15px;font-weight:800;margin-bottom:6px;}
+    .insight-body{font-size:13px;color:var(--muted2);}
+
+    /* Quote */
+    blockquote{border-left:3px solid var(--primary);padding:12px 20px;background:rgba(26,86,219,.07);border-radius:0 8px 8px 0;margin:16px 0;font-size:14px;color:var(--muted2);}
+    blockquote strong{color:var(--text);}
+
+    /* Divider */
+    .divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:48px 0;}
+
+    /* Budget chart */
+    .budget-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+    .budget-item:last-child{border:none;}
+    .budget-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .budget-name{flex:1;font-size:13px;font-weight:600;}
+    .budget-pct{font-size:13px;font-weight:800;color:var(--pl);}
+    .budget-val{font-size:12px;color:var(--muted2);width:80px;text-align:right;}
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-brand">Frank AI OS</div>
+  <a href="#jtbd">Jobs-to-be-Done</a>
+  <a href="#dores">Dores</a>
+  <a href="#pertencimento">Pertencimento</a>
+  <a href="#grupos">4 Grupos</a>
+  <a href="#7114">7-11-4</a>
+  <a href="#flywheel-b2c">Flywheel B2C</a>
+  <a href="#flywheel-b2b">Flywheel B2B</a>
+  <a href="#plataformas">Plataformas</a>
+  <a href="#mercado">Mercado</a>
+  <a href="#calendario">30 Dias</a>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="tag tag-blue">CMO Director + Swarm B2C · B2B · Content · CRM · BI</div>
+  <h1>Estratégia de Conteúdo<br/><span style="background:linear-gradient(135deg,#60A5FA,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Davvero Gelato 2026</span></h1>
+  <p class="hero-sub">Framework 7-11-4 · Flywheel (não funil) · B2C + B2B · 4 Grupos · Micro-momentos · Insights de mercado</p>
+
+  <div class="card-grid grid-4" style="margin-top:24px">
+    <div class="kpi"><div class="label">Jobs-to-be-Done</div><div class="val ok">9</div><div class="note">problemas resolvidos</div></div>
+    <div class="kpi"><div class="label">Grupos de Conteúdo</div><div class="val" style="color:var(--al)">4</div><div class="note">com 16 subgrupos</div></div>
+    <div class="kpi"><div class="label">Touchpoints 7-11-4</div><div class="val" style="color:var(--warning)">11</div><div class="note">mapeados</div></div>
+    <div class="kpi"><div class="label">Plataformas</div><div class="val" style="color:var(--pl)">6</div><div class="note">estratégia por canal</div></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ─── JTBD ─────────────────────────────────────────────────────────────────── -->
+<div id="jtbd" class="section">
+  <div class="tag tag-blue">Bloco 1</div>
+  <h2>Jobs-to-be-Done</h2>
+  <p>O cliente não compra gelato — ele contrata uma solução para um trabalho emocional, social ou funcional.</p>
+
+  <blockquote>
+    <strong>Insight principal:</strong> A Davvero não vende gelato. Vende <strong>permissão para se tratar bem</strong> — com a legitimidade do artesanal italiano como "prova de qualidade". O cliente contrata Davvero quando precisa de: <em>prazer sem arrependimento + sinal social de bom gosto + momento para si mesmo.</em>
+  </blockquote>
+
+  <div class="card-grid grid-3">
+    <div class="card">
+      <h4>🔧 Jobs Funcionais</h4>
+      <table>
+        <tr><th>Job</th><th>Contexto</th></tr>
+        <tr><td>Refresco premium</td><td><span class="badge b-blue">Alta freq.</span></td></tr>
+        <tr><td>Sobremesa de qualidade</td><td><span class="badge b-ok">Média</span></td></tr>
+        <tr><td>Presente comestível</td><td><span class="badge b-warn">Baixa</span></td></tr>
+        <tr><td>Lanche sem culpa</td><td><span class="badge b-blue">Alta freq.</span></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h4>❤️ Jobs Emocionais</h4>
+      <table>
+        <tr><th>Job</th><th>Gatilho</th></tr>
+        <tr><td><strong>Escapismo cotidiano</strong></td><td>Dia difícil</td></tr>
+        <tr><td>Celebração interna</td><td>Meta batida</td></tr>
+        <tr><td>Reconexão com infância</td><td>Nostalgia</td></tr>
+        <tr><td>Conforto emocional</td><td>Tristeza leve</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h4>🌐 Jobs Sociais</h4>
+      <table>
+        <tr><th>Job</th><th>O que compra</th></tr>
+        <tr><td>Sinal de bom gosto</td><td>Status</td></tr>
+        <tr><td>Facilitador conexão</td><td>Programa com outros</td></tr>
+        <tr><td>Curadoria para outros</td><td>Ser especialista</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── DORES ──────────────────────────────────────────────────────────────────── -->
+<div id="dores" class="section">
+  <div class="tag tag-red">Bloco 2</div>
+  <h2>Dores do Cliente</h2>
+
+  <div class="card-grid grid-2">
+    <div>
+      <div class="card" style="border-left:3px solid var(--danger)">
+        <h4>😤 Dor 1 — Gelado industrial se passando por premium</h4>
+        <p>"R$18 num potinho com mais gordura hidrogenada que leite de verdade."</p>
+        <div class="badge b-blue">Oportunidade: transparência radical de ingredientes</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--danger)">
+        <h4>😤 Dor 2 — Não sei o que vou comer antes de chegar</h4>
+        <p>Sem cardápio online atualizado gera ansiedade e reduz ticket médio.</p>
+        <div class="badge b-blue">Oportunidade: cardápio digital + sabor do dia</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--warning)">
+        <h4>😤 Dor 3 — Preço parece caro sem contexto</h4>
+        <p>R$45-65 sem entender o porquê. Cliente compara errado.</p>
+        <div class="badge b-blue">Oportunidade: vender a experiência, não o produto</div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="border-left:3px solid var(--warning)">
+        <h4>😤 Dor 4 — Não me sinto parte de nada</h4>
+        <p>Sem programa de fidelidade significativo, sem personalização, sem reconhecimento.</p>
+        <div class="badge b-blue">Oportunidade: Clube Amici + rituais de pertencimento</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--warning)">
+        <h4>😤 Dor 5 — Paralisia de escolha</h4>
+        <p>Carta extensa sem orientação → cliente pede o mais óbvio, experiência incompleta.</p>
+        <div class="badge b-blue">Oportunidade: "Scelta del Gelataio" — curadoria ativa</div>
+      </div>
+      <div class="card">
+        <h4>Top objeções à primeira compra</h4>
+        <div class="progress-wrap"><div class="progress-label"><span>Preço alto</span><span class="bad">★★★★★</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--danger)"></div></div></div>
+        <div class="progress-wrap"><div class="progress-label"><span>Não conheço a marca</span><span class="warn">★★★★☆</span></div><div class="progress-bar"><div class="progress-fill" style="width:80%;background:var(--warning)"></div></div></div>
+        <div class="progress-wrap"><div class="progress-label"><span>Não sei se vou gostar</span><span class="ok">★★★☆☆</span></div><div class="progress-bar"><div class="progress-fill" style="width:60%;background:var(--sl)"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── PERTENCIMENTO ─────────────────────────────────────────────────────────── -->
+<div id="pertencimento" class="section">
+  <div class="tag tag-purple">Bloco 3</div>
+  <h2>Pertencimento: Criando a Tribo Davvero</h2>
+
+  <div class="card-grid grid-3">
+    <div class="card" style="border-top:3px solid var(--muted)">
+      <h4>Nível 1 — Consumidor</h4>
+      <p style="font-size:16px;font-style:italic;">"Compro quando passa perto"</p>
+      <div style="margin-top:8px">
+        <div class="badge b-warn">1-2x/mês</div>
+        <div class="badge b-warn" style="margin-left:4px">NPS neutro</div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--pl)">
+      <h4>Nível 2 — Fã</h4>
+      <p style="font-size:16px;font-style:italic;">"Tenho meus sabores favoritos e recomendo"</p>
+      <div style="margin-top:8px">
+        <div class="badge b-blue">4-6x/mês</div>
+        <div class="badge b-blue" style="margin-left:4px">NPS promotor</div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--sl)">
+      <h4>Nível 3 — Membro da Tribo</h4>
+      <p style="font-size:16px;font-style:italic;">"Sou a pessoa que leva todo mundo na Davvero"</p>
+      <div style="margin-top:8px">
+        <div class="badge b-ok">8-12x/mês</div>
+        <div class="badge b-ok" style="margin-left:4px">NPS evangelista</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Rituais, Linguagem e Símbolos</h3>
+    <div class="card-grid grid-2">
+      <div>
+        <h4>Rituais a criar</h4>
+        <ul style="list-style:none;padding:0">
+          <li style="padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted2)">🗓️ <strong style="color:var(--text)">Quarta de Gelato</strong> — desconto semanal membros</li>
+          <li style="padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted2)">📲 <strong style="color:var(--text)">Sabor da Semana</strong> — exclusivo WhatsApp</li>
+          <li style="padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted2)">🍦 <strong style="color:var(--text)">Gelataio Recommends</strong> — sommelier do gelato</li>
+          <li style="padding:6px 0;color:var(--muted2)">✍️ <strong style="color:var(--text)">Nome escrito à mão</strong> no copo</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Linguagem exclusiva da tribo</h4>
+        <ul style="list-style:none;padding:0">
+          <li style="padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted2)">Clientes = <strong style="color:var(--pl)">Amici Davvero</strong></li>
+          <li style="padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted2)">Funcionários = <strong style="color:var(--pl)">Gelataios</strong></li>
+          <li style="padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted2)">Curadoria = <strong style="color:var(--pl)">Scelta del Gelataio</strong></li>
+          <li style="padding:6px 0;color:var(--muted2)">Hashtag = <strong style="color:var(--pl)">#VidaComGelato</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── 4 GRUPOS ──────────────────────────────────────────────────────────────── -->
+<div id="grupos" class="section">
+  <div class="tag tag-amber">Bloco 4</div>
+  <h2>4 Grupos de Conteúdo</h2>
+
+  <!-- Group tabs -->
+  <div class="group-tabs">
+    <div class="gtab active" onclick="showGroup('clientes',this)">🟦 Clientes (B2C)</div>
+    <div class="gtab" onclick="showGroup('parceiros',this)">🟩 Parceiros (B2B)</div>
+    <div class="gtab" onclick="showGroup('celebridades',this)">🟨 Influenciadores</div>
+    <div class="gtab" onclick="showGroup('espectadores',this)">🟥 Espectadores</div>
+  </div>
+
+  <!-- Clientes -->
+  <div id="g-clientes">
+    <div class="card-grid grid-2">
+      <div class="card">
+        <div class="tag tag-blue">1.1 · Ritual Seeker</div>
+        <h4>A Mulher do Autocuidado</h4>
+        <p>28-40 anos, rotina intensa, pequenos prazeres como ritual pessoal.</p>
+        <div style="font-size:12px;color:var(--muted2)">
+          <div>⏰ <strong style="color:var(--text)">Micro-momento:</strong> 15h de quinta — "Mereço algo bom"</div>
+          <div>📱 <strong style="color:var(--text)">Canal:</strong> Instagram Stories + WhatsApp</div>
+          <div>📝 <strong style="color:var(--text)">Conteúdo:</strong> "Para você que trabalhou duro essa semana"</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-blue">1.2 · Família Experiência</div>
+        <h4>O Pai/Mãe Programa</h4>
+        <p>32-45 anos, busca programa diferente com filhos no fim de semana.</p>
+        <div style="font-size:12px;color:var(--muted2)">
+          <div>⏰ <strong style="color:var(--text)">Micro-momento:</strong> Sábado manhã — planejando o dia</div>
+          <div>📱 <strong style="color:var(--text)">Canal:</strong> Instagram + Google Maps</div>
+          <div>📝 <strong style="color:var(--text)">Conteúdo:</strong> "O programa perfeito com os pequenos"</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-blue">1.3 · Foodie Creator</div>
+        <h4>O Content Creator</h4>
+        <p>20-35 anos, come para postar, influencia 200-2.000 pessoas.</p>
+        <div style="font-size:12px;color:var(--muted2)">
+          <div>⏰ <strong style="color:var(--text)">Micro-momento:</strong> Pré-saída — pesquisa "onde postar hoje"</div>
+          <div>📱 <strong style="color:var(--text)">Canal:</strong> Instagram Explore + Google Maps</div>
+          <div>📝 <strong style="color:var(--text)">Conteúdo:</strong> Produto fotogênico, ambiente Instagramável</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-blue">1.4 · Presenteador</div>
+        <h4>O Presenteador Social</h4>
+        <p>30-55 anos, evento social próximo, busca presente diferente.</p>
+        <div style="font-size:12px;color:var(--muted2)">
+          <div>⏰ <strong style="color:var(--text)">Micro-momento:</strong> 3 dias antes — busca "presente diferente SP"</div>
+          <div>📱 <strong style="color:var(--text)">Canal:</strong> Google Search + Instagram</div>
+          <div>📝 <strong style="color:var(--text)">Conteúdo:</strong> "O presente que ninguém esperava"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parceiros (hidden) -->
+  <div id="g-parceiros" style="display:none">
+    <div class="card-grid grid-2">
+      <div class="card">
+        <div class="tag tag-green">2.1 · Executivo em Transição</div>
+        <h4>Ex-executivo buscando independência</h4>
+        <p>38-52 anos, capital de rescisão/FGTS, quer sair do CLT definitivamente.</p>
+        <div style="font-size:12px;color:var(--muted2)">
+          <div>⏰ <strong style="color:var(--text)">Micro-momento:</strong> Semana 2-4 após demissão</div>
+          <div>📱 <strong style="color:var(--text)">Canal:</strong> Google "franquia lucrativa SP" + LinkedIn</div>
+          <div>📝 <strong style="color:var(--text)">Conteúdo:</strong> "Ex-executivo que virou empresário" case</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-green">2.2 · Investidor Diversificador</div>
+        <h4>Empresário buscando ativo real</h4>
+        <p>35-50 anos, tem renda principal, quer diversificar com negócio físico.</p>
+        <div style="font-size:12px;color:var(--muted2)">
+          <div>⏰ <strong style="color:var(--text)">Micro-momento:</strong> Após evento de investimentos</div>
+          <div>📱 <strong style="color:var(--text)">Canal:</strong> LinkedIn + Feiras ABF</div>
+          <div>📝 <strong style="color:var(--text)">Conteúdo:</strong> ROI vs FII/ações, payback comprovado</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-green">2.3 · Casal Empreendedor</div>
+        <h4>Casal que quer empreender junto</h4>
+        <p>30-45 anos, negócio de lifestyle, sonho de ter algo próprio juntos.</p>
+        <div style="font-size:12px;color:var(--muted2)">
+          <div>⏰ <strong style="color:var(--text)">Micro-momento:</strong> Após viagem à Europa + conversa de casal</div>
+          <div>📱 <strong style="color:var(--text)">Canal:</strong> Instagram + LinkedIn + Visita à unidade</div>
+          <div>📝 <strong style="color:var(--text)">Conteúdo:</strong> "Negócio para construir junto", day-in-life</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-green">2.4 · Fornecedor / Parceiro</div>
+        <h4>Parceiro comercial e fornecedor</h4>
+        <p>Fornecedores de insumos, embalagens, equipamentos que buscam homologação.</p>
+        <div style="font-size:12px;color:var(--muted2)">
+          <div>⏰ <strong style="color:var(--text)">Micro-momento:</strong> Feiras Abre&Fecha, ABF</div>
+          <div>📱 <strong style="color:var(--text)">Canal:</strong> LinkedIn + Email direto</div>
+          <div>📝 <strong style="color:var(--text)">Conteúdo:</strong> Portal de fornecedores, critérios de homologação</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Influenciadores (hidden) -->
+  <div id="g-celebridades" style="display:none">
+    <div class="card-grid grid-2">
+      <div class="card">
+        <div class="tag tag-amber">3.1 · Nano (1k-10k)</div>
+        <h4>Amici Davvero Creators</h4>
+        <p>50-100 ativas por unidade. UGC incentivado com experiência (não cash).</p>
+        <div style="font-size:12px;color:var(--muted2);margin-top:8px">
+          <div><strong style="color:var(--text)">Mecânica:</strong> Acesso antecipado a sabores + evento exclusivo mensal</div>
+          <div><strong style="color:var(--text)">Formato:</strong> Reels espontâneos, Stories reais</div>
+          <div><strong style="color:var(--text)">Custo:</strong> Produto (custo marginal ~R$20/pessoa)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-amber">3.2 · Micro (10k-100k)</div>
+        <h4>Food Bloggers e Lifestyle</h4>
+        <p>10-20 ativas/mês por praça. Parceria paga leve R$500-2.000/post.</p>
+        <div style="font-size:12px;color:var(--muted2);margin-top:8px">
+          <div><strong style="color:var(--text)">Formato:</strong> Reel "meu pedido favorito", Stories visita</div>
+          <div><strong style="color:var(--text)">Brief:</strong> Criativo mas não roteirizado</div>
+          <div><strong style="color:var(--text)">KPI:</strong> CPE (custo por engajamento) &lt; R$0,50</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-amber">3.3 · Macro (100k-1M)</div>
+        <h4>Collab "Sabor do Influencer"</h4>
+        <p>2-4 collabs/ano. Criação de sabor exclusivo co-criado com influencer.</p>
+        <div style="font-size:12px;color:var(--muted2);margin-top:8px">
+          <div><strong style="color:var(--text)">Série:</strong> Anúncio → processo → lançamento → feedback (4-6 posts)</div>
+          <div><strong style="color:var(--text)">PR:</strong> Gera cobertura espontânea de mídia</div>
+          <div><strong style="color:var(--text)">Duração:</strong> Sabor por tempo limitado (urgência)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-amber">3.4 · Celebridade / Chef</div>
+        <h4>Parceria Estratégica de Prestígio</h4>
+        <p>1 grande collab/semestre. Chef renomado, sommelier, personalidade local.</p>
+        <div style="font-size:12px;color:var(--muted2);margin-top:8px">
+          <div><strong style="color:var(--text)">Formato:</strong> Evento lançamento + documentário 3-5 min</div>
+          <div><strong style="color:var(--text)">Resultado:</strong> Eleva percepção premium + mídia espontânea</div>
+          <div><strong style="color:var(--text)">Press release:</strong> Para mídia gastronômica especializada</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Espectadores (hidden) -->
+  <div id="g-espectadores" style="display:none">
+    <div class="card-grid grid-2">
+      <div class="card">
+        <div class="tag tag-red">4.1 · Descobridor Local</div>
+        <h4>Morador do Bairro</h4>
+        <p>Mora perto de uma unidade, busca "o que fazer" no Maps/Instagram.</p>
+        <div style="font-size:12px;color:var(--muted2);margin-top:8px">
+          <div>⏰ Sábado 14h, abrindo Google Maps</div>
+          <div>📍 Canal: Google My Business + Instagram Explore + geotag</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-red">4.2 · Pesquisador de Franquias</div>
+        <h4>Empreendedor Curioso</h4>
+        <p>Ainda na fase de curiosidade, não comprometido ainda.</p>
+        <div style="font-size:12px;color:var(--muted2);margin-top:8px">
+          <div>⏰ Domingo noite, YouTube "melhores franquias 2026"</div>
+          <div>📍 Canal: YouTube + Google Search + LinkedIn</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-red">4.3 · Turista Gastronômico</div>
+        <h4>Visitante da Cidade</h4>
+        <p>Busca experiências locais autênticas, TripAdvisor e Google.</p>
+        <div style="font-size:12px;color:var(--muted2);margin-top:8px">
+          <div>⏰ No hotel, buscando "melhor gelato em SP"</div>
+          <div>📍 Canal: Google Maps + TripAdvisor + Instagram Explore</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag tag-red">4.4 · Seguidor Indireto</div>
+        <h4>Amigo de Cliente Ativo</h4>
+        <p>Viu conteúdo orgânico de amigo e foi "descobrir".</p>
+        <div style="font-size:12px;color:var(--muted2);margin-top:8px">
+          <div>⏰ Stories de amigo com gelato → "Onde é isso?"</div>
+          <div>📍 Canal: UGC de clientes, tag no Instagram</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── 7-11-4 ────────────────────────────────────────────────────────────────── -->
+<div id="7114" class="section">
+  <div class="tag tag-blue">Bloco 5</div>
+  <h2>Framework 7-11-4 (Google)</h2>
+  <p>O consumidor precisa de <strong style="color:var(--pl)">7h de conteúdo</strong>, <strong style="color:var(--warning)">11 touchpoints</strong> e estar em <strong style="color:var(--sl)">4 plataformas</strong> antes de decidir.</p>
+
+  <div class="timeline" style="margin-top:24px">
+    <div class="tl-item"><div class="tl-dot">1</div><div class="tl-title">Descoberta Passiva</div><div class="tl-body">Instagram Explore / TikTok FYP — Reel 15-30s de produto em câmera lenta. "Nunca vi isso, parece bom"</div><div class="tl-meta">⏱ 30 segundos · Ação: segue ou salva</div></div>
+    <div class="tl-item"><div class="tl-dot">2</div><div class="tl-title">Reconhecimento de Marca</div><div class="tl-body">Google Search "gelato premium SP" — SEO + GMB com fotos. "Já vi isso antes, vou ver mais"</div><div class="tl-meta">⏱ 2-3 minutos · Ação: clica no GMB</div></div>
+    <div class="tl-item"><div class="tl-dot">3</div><div class="tl-title">Exploração de Conteúdo</div><div class="tl-body">Instagram / Site — Feed, destaques, cardápio. "Quero entender o que oferecem"</div><div class="tl-meta">⏱ 8-12 minutos · Ação: consome 5-10 posts</div></div>
+    <div class="tl-item"><div class="tl-dot">4</div><div class="tl-title">Prova Social</div><div class="tl-body">Google Reviews + UGC — "Será que as pessoas gostam mesmo?" Lê avaliações reais.</div><div class="tl-meta">⏱ 5-10 minutos · Ação: lê reviews</div></div>
+    <div class="tl-item"><div class="tl-dot">5</div><div class="tl-title">Conteúdo Educacional</div><div class="tl-body">Reels/YouTube — "Como é feito o gelato artesanal". "Por que é diferente/melhor?"</div><div class="tl-meta">⏱ 2-5 minutos · Ação: assiste completo, salva</div></div>
+    <div class="tl-item"><div class="tl-dot">6</div><div class="tl-title">Identificação com Comunidade</div><div class="tl-body">UGC + Stories — Clientes reais, rituais da tribo. "Eu me identifico com quem consome isso"</div><div class="tl-meta">⏱ 5-8 minutos · Ação: marca amigo</div></div>
+    <div class="tl-item"><div class="tl-dot">7</div><div class="tl-title">Intenção de Visita</div><div class="tl-body">Google Maps — Fotos do espaço, horários. "Vou planejar uma visita"</div><div class="tl-meta">⏱ 3-5 minutos · Ação: salva local, add wishlist</div></div>
+    <div class="tl-item"><div class="tl-dot">8</div><div class="tl-title">Ativação Pré-visita</div><div class="tl-body">WhatsApp / Push / Stories — "Hoje tem [especial]", oferta exclusiva membros. "Essa é a hora de ir"</div><div class="tl-meta">⏱ 1-2 minutos · Ação: decide ir hoje</div></div>
+    <div class="tl-item"><div class="tl-dot">9</div><div class="tl-title">Experiência In-Store</div><div class="tl-body">PDV Físico — Vitrine, ritual de degustação, Gelataio recomenda. "Quero que valha o preço"</div><div class="tl-meta">⏱ 10-20 minutos · Ação: compra + satisfação</div></div>
+    <div class="tl-item"><div class="tl-dot">10</div><div class="tl-title">Pós-compra e Compartilhamento</div><div class="tl-body">Instagram Stories / Google Review — "Vou compartilhar porque aprovei". Gera novos T.P. para outros.</div><div class="tl-meta">⏱ 5-10 minutos · Ação: post orgânico</div></div>
+    <div class="tl-item"><div class="tl-dot">11</div><div class="tl-title">Retenção e Rituais</div><div class="tl-body">WhatsApp + Fidelidade — "Sua quarta de gelato está chegando". "Faz parte da minha rotina"</div><div class="tl-meta">⏱ Contínuo · Ação: visita recorrente</div></div>
+  </div>
+
+  <div class="card" style="margin-top:24px">
+    <h4>Distribuição das 7 Horas de Conteúdo</h4>
+    <div style="margin-top:12px">
+      <div class="progress-wrap"><div class="progress-label"><span>Vídeos curtos (Reels/TikTok)</span><span style="color:var(--pl)">2h</span></div><div class="progress-bar"><div class="progress-fill" style="width:29%;background:var(--primary)"></div></div></div>
+      <div class="progress-wrap"><div class="progress-label"><span>Conteúdo longo (YouTube)</span><span style="color:var(--pl)">1.5h</span></div><div class="progress-bar"><div class="progress-fill" style="width:21%;background:var(--accent)"></div></div></div>
+      <div class="progress-wrap"><div class="progress-label"><span>Leitura (captions/blog)</span><span style="color:var(--pl)">1h</span></div><div class="progress-bar"><div class="progress-fill" style="width:14%;background:var(--sl)"></div></div></div>
+      <div class="progress-wrap"><div class="progress-label"><span>Reviews e prova social</span><span style="color:var(--pl)">1h</span></div><div class="progress-bar"><div class="progress-fill" style="width:14%;background:var(--warning)"></div></div></div>
+      <div class="progress-wrap"><div class="progress-label"><span>CRM / WhatsApp</span><span style="color:var(--pl)">0.5h</span></div><div class="progress-bar"><div class="progress-fill" style="width:7%;background:var(--sl)"></div></div></div>
+      <div class="progress-wrap"><div class="progress-label"><span>Experiência in-store</span><span style="color:var(--pl)">1h</span></div><div class="progress-bar"><div class="progress-fill" style="width:14%;background:var(--danger)"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── FLYWHEEL B2C ───────────────────────────────────────────────────────────── -->
+<div id="flywheel-b2c" class="section">
+  <div class="tag tag-green">Bloco 6</div>
+  <h2>Flywheel B2C</h2>
+  <p>O flywheel substitui o funil porque a energia não se perde — cada fase alimenta a anterior e acelera o sistema.</p>
+
+  <div class="fw-ring">
+    <div class="fw-phase fw-attract">
+      <div class="fw-icon">⚡</div>
+      <div class="fw-title" style="color:var(--pl)">ATTRACT</div>
+      <div class="fw-sub">Reels ASMR, TikTok viral, UGC compartilhado, Google Maps</div>
+    </div>
+    <div class="fw-arrow">→</div>
+    <div class="fw-phase fw-engage">
+      <div class="fw-icon">🔥</div>
+      <div class="fw-title" style="color:var(--warning)">ENGAGE</div>
+      <div class="fw-sub">Backstage, quiz de sabores, oferta primeira visita, WhatsApp opt-in</div>
+    </div>
+    <div class="fw-arrow">→</div>
+    <div class="fw-phase fw-delight">
+      <div class="fw-icon">💛</div>
+      <div class="fw-title" style="color:var(--sl)">DELIGHT</div>
+      <div class="fw-sub">Ritual Gelataio, nome no copo, surpresa aniversário, preferências salvas</div>
+    </div>
+    <div class="fw-arrow">→</div>
+    <div class="fw-phase fw-advocate">
+      <div class="fw-icon">🚀</div>
+      <div class="fw-title" style="color:var(--al)">ADVOCATE</div>
+      <div class="fw-sub">UGC #VidaComGelato, Referral, Noite dos Amici, review incentivado</div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">🔄</div>
+    <div class="insight-title">Como o Flywheel se Auto-alimenta</div>
+    <div class="insight-body">
+      ADVOCATE → ATTRACT: posts orgânicos de fãs atingem novos espectadores<br/>
+      ATTRACT → ENGAGE: curioso vira seguidor vira cadastrado no WhatsApp<br/>
+      ENGAGE → DELIGHT: expectativa criada + experiência superior = memória positiva<br/>
+      DELIGHT → ADVOCATE: satisfação extrema elimina barreira para compartilhar<br/>
+      ADVOCATE → DELIGHT: comunidade ativa valida escolha de volta para membros existentes
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── FLYWHEEL B2B ───────────────────────────────────────────────────────────── -->
+<div id="flywheel-b2b" class="section">
+  <div class="tag tag-purple">Bloco 7</div>
+  <h2>Flywheel B2B — Franqueados</h2>
+
+  <div class="card-grid grid-2">
+    <div class="card" style="border-left:3px solid var(--pl)">
+      <h4>⚡ ATTRACT</h4>
+      <p>"Quanto ganha um franqueado Davvero?" — LinkedIn com dados reais</p>
+      <p>"Um dia na vida" — YouTube 10 min com acesso real à operação</p>
+      <p>SEO: "franquia de gelato", "franquia food SP"</p>
+      <div class="badge b-blue">Meta: 15 leads qualificados/mês</div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--warning)">
+      <h4>🔥 ENGAGE — Sequência 21 dias</h4>
+      <p>Dia 0: Perfil do franqueado ideal · Dia 3: Case DVR-SP-003 · Dia 7: Suporte pós-inauguração · Dia 14: Convite visita à unidade</p>
+      <div class="badge b-warn">Meta: 25% taxa de visita agendada</div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--sl)">
+      <h4>💛 DELIGHT</h4>
+      <p>Visita guiada com franqueado ativo (peer-to-peer) · "Dia como Gelataio" · Viabilidade CFO Agent · Kit "Bem-vindo à Famiglia"</p>
+      <div class="badge b-ok">Meta: NPS do processo ≥ 8.0</div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--al)">
+      <h4>🚀 ADVOCATE</h4>
+      <p>Programa Padrino: franqueado indica, ganha benefício · Rede WhatsApp "Famiglia Davvero" · Case study LinkedIn com dados reais</p>
+      <div class="badge b-purple">Meta: 30% leads via indicação de franqueado</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── PLATAFORMAS ────────────────────────────────────────────────────────────── -->
+<div id="plataformas" class="section">
+  <div class="tag tag-blue">Bloco 8</div>
+  <h2>Estratégia por Plataforma</h2>
+
+  <div class="platform-card">
+    <div class="platform-header">
+      <div class="platform-icon">📸</div>
+      <div><div class="platform-name">Instagram</div><div class="platform-goal">Awareness + Comunidade + Conversão local · 5-7 posts/semana</div></div>
+      <div style="margin-left:auto"><span class="badge b-blue">Plataforma #1</span></div>
+    </div>
+    <div class="card-grid grid-3">
+      <div style="font-size:12px"><strong>Pilares (60/20/20)</strong><br/><span class="badge b-blue">60%</span> Produto e experiência<br/><span class="badge b-warn">20%</span> Comunidade + UGC<br/><span class="badge b-ok">20%</span> Bastidores</div>
+      <div style="font-size:12px"><strong>Formatos</strong><br/>Reel 15-30s ASMR · 3x/sem<br/>Carrossel educacional · 2x/sem<br/>Stories interativos · diário<br/>Close Friends Amici · 2x/sem</div>
+      <div style="font-size:12px"><strong>KPI principal</strong><br/>Engajamento meta: ≥5%<br/>Cliques "Como Chegar"<br/>Novos seguidores/mês</div>
+    </div>
+    <div class="content-example">
+      <strong>Exemplo real — Reel ASMR:</strong><br/>
+      [Câmera lenta, colher afundando no gelato de pistache, luz dourada]<br/>
+      Caption: "Porque alguns momentos merecem o melhor 🫒✨ Pistache do Mediterrâneo — disponível hoje. #VidaComGelato"
+    </div>
+  </div>
+
+  <div class="platform-card">
+    <div class="platform-header">
+      <div class="platform-icon">🎵</div>
+      <div><div class="platform-name">TikTok</div><div class="platform-goal">Awareness 18-30 anos · 4-5 vídeos/semana · Tom: autêntico, sem roteiro</div></div>
+      <div style="margin-left:auto"><span class="badge b-blue">Plataforma #2 (crescimento)</span></div>
+    </div>
+    <div class="content-example">
+      <strong>Exemplo real — POV Gelataio:</strong><br/>
+      "POV: você é o Gelataio da Davvero numa tarde de sábado"<br/>
+      [Cenas: fila na porta, criança escolhendo sabor, casal compartilhando, alguém tirando 47 fotos antes de comer]
+    </div>
+  </div>
+
+  <div class="platform-card">
+    <div class="platform-header">
+      <div class="platform-icon">🔍</div>
+      <div><div class="platform-name">Google Search + Maps</div><div class="platform-goal">Capturar intenção de compra declarada · SEO contínuo + GMB</div></div>
+      <div style="margin-left:auto"><span class="badge b-ok">Alta conversão</span></div>
+    </div>
+    <div class="card-grid grid-3" style="margin-top:12px">
+      <div style="font-size:12px"><strong>Keywords prioritárias</strong><br/>"gelato artesanal SP" — Alta<br/>"melhor gelato são paulo" — Alta<br/>"franquia de gelato SP" — Médio<br/>"gelato pinheiros horário" — Médio</div>
+      <div style="font-size:12px"><strong>GMB — Ação imediata</strong><br/>30+ fotos por unidade<br/>Posts semanais (sabor do dia)<br/>Q&A respondido em 24h<br/>Meta reviews: 4.8★</div>
+      <div style="font-size:12px"><strong>Google Ads</strong><br/>Search local → Maps<br/>B2B franquia → Landing page<br/>Display retargeting 30 dias</div>
+    </div>
+  </div>
+
+  <div class="platform-card">
+    <div class="platform-header">
+      <div class="platform-icon">💬</div>
+      <div><div class="platform-name">WhatsApp / CRM</div><div class="platform-goal">Retenção + Reativação · Máx 2-3 msg/semana · Tom: pessoal como amigo</div></div>
+      <div style="margin-left:auto"><span class="badge b-ok">Retenção #1</span></div>
+    </div>
+    <div class="content-example">
+      <strong>Onboarding — Dia 1 pós-visita:</strong><br/>
+      "Oi [Nome]! Como foi a experiência? Aqui está o cardápio completo + seu sabor do dia favorito já salvo 🍦"<br/><br/>
+      <strong>Ativação — Toda quarta:</strong><br/>
+      "🍦 Quarta de Gelato! Mostre essa mensagem e ganhe colherada extra. Te esperamos! 😊"
+    </div>
+  </div>
+
+  <div class="platform-card">
+    <div class="platform-header">
+      <div class="platform-icon">💼</div>
+      <div><div class="platform-name">LinkedIn (B2B)</div><div class="platform-goal">Geração de leads franqueados · 3-4 posts/semana · Tom: empreendedor + dados</div></div>
+      <div style="margin-left:auto"><span class="badge b-purple">B2B exclusivo</span></div>
+    </div>
+    <div class="content-example">
+      <strong>Exemplo real — Post com dado + história:</strong><br/>
+      "Em março de 2025, a DVR-RJ-001 estava com CMV de 29%.<br/>
+      Em setembro, 24%.<br/><br/>
+      O que mudou? Não foi o preço. Foi o treinamento de fichas técnicas — 4 horas.<br/>
+      Isso economizou R$8.400/mês."
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── MERCADO ────────────────────────────────────────────────────────────────── -->
+<div id="mercado" class="section">
+  <div class="tag tag-purple">Bloco 9</div>
+  <h2>Insights de Mercado</h2>
+
+  <div class="card-grid grid-4" style="margin-bottom:24px">
+    <div class="kpi"><div class="label">Mercado total BR</div><div class="val ok">R$8,5B</div><div class="note">sorvetes/gelato (ABIS)</div></div>
+    <div class="kpi"><div class="label">Crescimento premium</div><div class="val" style="color:var(--sl)">+22%</div><div class="note">ao ano pós-pandemia</div></div>
+    <div class="kpi"><div class="label">Penetração gelato artesanal</div><div class="val warn">&lt;5%</div><div class="note">do mercado total</div></div>
+    <div class="kpi"><div class="label">Delivery food (2026)</div><div class="val" style="color:var(--pl)">40%</div><div class="note">das vendas (Euromonitor)</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Davvero vs Benchmarks do Setor</h3>
+    <table>
+      <tr><th>KPI</th><th>Davvero</th><th>Benchmark BR Premium</th><th>Status</th></tr>
+      <tr><td>CMV médio rede</td><td><strong>26.2%</strong></td><td>25-28%</td><td><span class="badge b-ok">✅ OK</span></td></tr>
+      <tr><td>NPS médio</td><td><strong>72</strong></td><td>68-75</td><td><span class="badge b-ok">✅ Bom</span></td></tr>
+      <tr><td>Ticket médio</td><td><strong>R$52</strong></td><td>R$45-70</td><td><span class="badge b-ok">✅ Competitivo</span></td></tr>
+      <tr><td>Instagram engajamento</td><td><strong>4.7%</strong></td><td>3-5% food</td><td><span class="badge b-ok">✅ Acima média</span></td></tr>
+      <tr><td>Meta Ads ROAS</td><td><strong>3.2x</strong></td><td>2.5-4.0</td><td><span class="badge b-ok">✅ Bom</span></td></tr>
+      <tr><td>Google Reviews</td><td><strong>~4.5★</strong></td><td>4.6+ melhores</td><td><span class="badge b-warn">⚠️ Melhorar</span></td></tr>
+      <tr><td>Turnover equipe</td><td><strong>~12%/mês</strong></td><td>8-10% food</td><td><span class="badge b-warn">⚠️ Alto</span></td></tr>
+    </table>
+  </div>
+
+  <div class="card-grid grid-3" style="margin-top:16px">
+    <div class="insight">
+      <div class="insight-icon">🟡</div>
+      <div class="insight-title">Oportunidade 1 — Delivery Premium</div>
+      <div class="insight-body">Zero presença em delivery com embalagem térmica. Potencial: +15-25% receita por unidade. Investimento: R$25k/unidade.</div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">🟡</div>
+      <div class="insight-title">Oportunidade 2 — Assinatura Famiglia</div>
+      <div class="insight-body">500 assinantes por cidade = R$50k/mês garantido no inverno. Box mensal R$119 com 4 potes + sabor exclusivo.</div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">🟡</div>
+      <div class="insight-title">Oportunidade 3 — Gelato Bar B2B</div>
+      <div class="insight-body">Eventos corporativos e sociais. 2-4 eventos/semana = R$8-20k adicional/mês com margem 45-55%.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── CALENDÁRIO ──────────────────────────────────────────────────────────────── -->
+<div id="calendario" class="section">
+  <div class="tag tag-amber">Bloco 10</div>
+  <h2>Próximos 30 Dias</h2>
+
+  <div class="card">
+    <table>
+      <tr><th>#</th><th>Ação</th><th>Prazo</th><th>Impacto</th></tr>
+      <tr><td><span class="badge b-bad">🔴 1</span></td><td><strong>Otimizar Google My Business (7 unidades)</strong> — fotos, posts, Q&A respondido</td><td>7 dias</td><td><span class="badge b-ok">+20% cliques Maps</span></td></tr>
+      <tr><td><span class="badge b-bad">🔴 2</span></td><td><strong>Criar fluxo WhatsApp pós-compra</strong> — onboarding 7 dias automatizado</td><td>10 dias</td><td><span class="badge b-ok">+15% retorno 30d</span></td></tr>
+      <tr><td><span class="badge b-warn">🟡 3</span></td><td><strong>Produzir batch de 8 Reels</strong> — 4 semanas de conteúdo Instagram</td><td>14 dias</td><td><span class="badge b-blue">+30% alcance orgânico</span></td></tr>
+      <tr><td><span class="badge b-warn">🟡 4</span></td><td><strong>Lançar "Quarta de Gelato"</strong> — campanha semanal para membros WhatsApp</td><td>7 dias</td><td><span class="badge b-blue">+10% vendas quartas</span></td></tr>
+      <tr><td><span class="badge b-ok">🟢 5</span></td><td><strong>Criar régua LinkedIn B2B</strong> — sequência 21 dias para leads franqueados</td><td>14 dias</td><td><span class="badge b-purple">+5 leads/mês</span></td></tr>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h4>Budget Allocation Sugerido — R$25.000/mês</h4>
+    <div style="margin-top:12px">
+      <div class="budget-item"><div class="budget-dot" style="background:var(--primary)"></div><div class="budget-name">Meta Ads (IG + FB)</div><div class="budget-pct">35%</div><div class="budget-val">R$ 8.750</div></div>
+      <div class="budget-item"><div class="budget-dot" style="background:var(--accent)"></div><div class="budget-name">Produção de Conteúdo</div><div class="budget-pct">25%</div><div class="budget-val">R$ 6.250</div></div>
+      <div class="budget-item"><div class="budget-dot" style="background:var(--warning)"></div><div class="budget-name">Micro-influencers (produto)</div><div class="budget-pct">20%</div><div class="budget-val">R$ 5.000</div></div>
+      <div class="budget-item"><div class="budget-dot" style="background:var(--sl)"></div><div class="budget-name">Google Ads + SEO</div><div class="budget-pct">10%</div><div class="budget-val">R$ 2.500</div></div>
+      <div class="budget-item"><div class="budget-dot" style="background:var(--muted2)"></div><div class="budget-name">CRM / WhatsApp Tools</div><div class="budget-pct">5%</div><div class="budget-val">R$ 1.250</div></div>
+      <div class="budget-item"><div class="budget-dot" style="background:var(--dl)"></div><div class="budget-name">Testes e Inovação</div><div class="budget-pct">5%</div><div class="budget-val">R$ 1.250</div></div>
+    </div>
+  </div>
+
+  <div class="card-grid grid-4" style="margin-top:16px">
+    <div class="kpi"><div class="label">Meta Instagram (90d)</div><div class="val ok">5.5%</div><div class="note">engajamento (atual 4.7%)</div></div>
+    <div class="kpi"><div class="label">WhatsApp opt-ins</div><div class="val" style="color:var(--pl)">500</div><div class="note">por unidade</div></div>
+    <div class="kpi"><div class="label">Google Reviews meta</div><div class="val warn">4.8★</div><div class="note">todas as unidades</div></div>
+    <div class="kpi"><div class="label">Leads B2B/mês</div><div class="val" style="color:var(--al)">15</div><div class="note">franqueados qualificados</div></div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:40px;color:var(--muted);font-size:12px;border-top:1px solid var(--border)">
+  Frank AI OS · CMO Director + B2C · B2B · Content · CRM Agents · Davvero Gelato · Abril 2026
+</div>
+
+</div>
+
+<script>
+function showGroup(id, el) {
+  document.querySelectorAll('[id^="g-"]').forEach(g => g.style.display = 'none');
+  document.getElementById('g-' + id).style.display = 'block';
+  document.querySelectorAll('.gtab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Animate progress bars on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.progress-fill').forEach(bar => {
+        const w = bar.style.width;
+        bar.style.width = '0';
+        setTimeout(() => bar.style.width = w, 100);
+      });
+    }
+  });
+}, {threshold: 0.3});
+document.querySelectorAll('.card').forEach(c => observer.observe(c));
+</script>
+</body>
+</html>
