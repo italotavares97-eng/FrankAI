@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Frank AI OS — Sistema de Gestão CEO · Davvero Gelato</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#0A0F1E; --bg-card:#111827; --bg-card2:#1E293B;
+      --border:#1F2D3D; --border-glow:rgba(26,86,219,.35);
+      --text:#F1F5F9; --muted:#64748B; --muted2:#94A3B8;
+      --primary:#1A56DB; --primary-light:#3B82F6; --primary-glow:rgba(26,86,219,.18);
+      --success:#057A55; --success-light:#34D399;
+      --warning:#D97706; --warning-light:#FCD34D;
+      --danger:#E02424; --danger-light:#F87171;
+      --accent:#8B5CF6; --accent-light:#A78BFA;
+      --gold:#F59E0B;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.6;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,15,30,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 24px;height:52px;overflow-x:auto}
+    .nav-logo{font-weight:800;font-size:15px;color:var(--text);text-decoration:none;white-space:nowrap;margin-right:8px}
+    .nav-logo span{color:var(--primary-light)}
+    nav a.nav-link{color:var(--muted2);text-decoration:none;font-size:12px;font-weight:500;padding:4px 10px;border-radius:6px;white-space:nowrap;transition:.15s}
+    nav a.nav-link:hover,nav a.nav-link.active{color:var(--text);background:rgba(255,255,255,.07)}
+    .nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+
+    /* LAYOUT */
+    .wrapper{max-width:1280px;margin:0 auto;padding:72px 20px 60px}
+    .page-title{padding:32px 0 8px}
+    .page-title h1{font-size:28px;font-weight:800;letter-spacing:-.5px}
+    .page-title h1 span{color:var(--primary-light)}
+    .page-title p{color:var(--muted2);margin-top:6px;font-size:13px}
+    .section{margin-top:48px}
+    .section-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+    .section-header h2{font-size:18px;font-weight:700}
+    .section-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:16px;flex-shrink:0}
+
+    /* CEO RULES STRIP */
+    .rules-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:24px}
+    @media(max-width:900px){.rules-strip{grid-template-columns:repeat(2,1fr)}}
+    .rule-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+    .rule-card.ok{border-color:rgba(5,122,85,.4)}
+    .rule-card.warn{border-color:rgba(217,119,6,.4)}
+    .rule-card.crit{border-color:rgba(224,36,36,.4)}
+    .rule-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+    .rule-value{font-size:22px;font-weight:800;margin:4px 0 2px}
+    .rule-value.ok{color:var(--success-light)}
+    .rule-value.warn{color:var(--warning-light)}
+    .rule-value.crit{color:var(--danger-light)}
+    .rule-limit{font-size:11px;color:var(--muted2)}
+    .rule-bar{height:4px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+    .rule-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
+    .rule-fill.ok{background:var(--success-light)}
+    .rule-fill.warn{background:var(--warning-light)}
+    .rule-fill.crit{background:var(--danger-light)}
+    .rule-status{position:absolute;top:12px;right:12px;font-size:16px}
+
+    /* SECTOR TABS */
+    .sector-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+    .sector-tab{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:.15s}
+    .sector-tab:hover{border-color:var(--primary);color:var(--text)}
+    .sector-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+    .sector-panel{display:none} .sector-panel.active{display:block}
+
+    /* SECTOR GRID */
+    .sector-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    @media(max-width:960px){.sector-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){.sector-grid{grid-template-columns:1fr}}
+    .sector-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px}
+    .sector-card h3{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .kpi-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .kpi-row:last-child{border-bottom:none}
+    .kpi-name{font-size:11px;color:var(--muted2)}
+    .kpi-val{font-size:12px;font-weight:700}
+    .badge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px}
+    .badge-ok{background:rgba(5,122,85,.2);color:var(--success-light)}
+    .badge-warn{background:rgba(217,119,6,.2);color:var(--warning-light)}
+    .badge-crit{background:rgba(224,36,36,.2);color:var(--danger-light)}
+    .badge-info{background:rgba(26,86,219,.2);color:var(--primary-light)}
+
+    /* UNIT RANKING */
+    .ranking-table{width:100%;border-collapse:collapse}
+    .ranking-table th{text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--border)}
+    .ranking-table td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+    .ranking-table tr:hover td{background:rgba(255,255,255,.02)}
+    .rank-num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700}
+    .rank-1{background:var(--gold);color:#000}
+    .rank-2{background:#9CA3AF;color:#000}
+    .rank-3{background:#B45309;color:#fff}
+    .rank-other{background:var(--border);color:var(--muted2)}
+    .bar-mini{height:4px;background:var(--border);border-radius:2px;width:60px;display:inline-block;vertical-align:middle;overflow:hidden}
+    .bar-fill-ok{height:100%;background:var(--success-light);border-radius:2px}
+    .bar-fill-warn{height:100%;background:var(--warning-light);border-radius:2px}
+    .bar-fill-crit{height:100%;background:var(--danger-light);border-radius:2px}
+
+    /* CADENCE */
+    .cadence-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    @media(max-width:900px){.cadence-grid{grid-template-columns:repeat(2,1fr)}}
+    .cadence-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px}
+    .cadence-freq{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+    .cadence-freq.daily{color:var(--danger-light)}
+    .cadence-freq.weekly{color:var(--warning-light)}
+    .cadence-freq.monthly{color:var(--primary-light)}
+    .cadence-freq.quarterly{color:var(--accent-light)}
+    .cadence-title{font-size:13px;font-weight:700;margin-bottom:10px}
+    .cadence-item{font-size:11px;color:var(--muted2);padding:3px 0;display:flex;gap:6px}
+    .cadence-item::before{content:"→";color:var(--muted);flex-shrink:0}
+
+    /* ACTION PLANS */
+    .pa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    @media(max-width:700px){.pa-grid{grid-template-columns:1fr}}
+    .pa-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px}
+    .pa-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+    .pa-code{font-size:10px;font-weight:700;color:var(--muted);font-family:monospace}
+    .pa-title{font-size:13px;font-weight:700;margin-bottom:10px}
+    .pa-row{display:grid;grid-template-columns:60px 1fr;gap:6px;margin-bottom:4px}
+    .pa-key{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase}
+    .pa-val{font-size:11px;color:var(--muted2)}
+    .pa-progress{margin-top:14px}
+    .pa-progress-label{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px}
+    .pa-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+    .pa-fill{height:100%;border-radius:3px;transition:width 1.4s ease}
+
+    /* ESCALATION */
+    .esc-table{width:100%;border-collapse:collapse}
+    .esc-table th{text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--border)}
+    .esc-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;vertical-align:top}
+    .esc-sev{display:flex;align-items:center;gap:6px;font-weight:700}
+
+    /* SOP LIST */
+    .sop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    @media(max-width:800px){.sop-grid{grid-template-columns:repeat(2,1fr)}}
+    .sop-item{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px}
+    .sop-code{font-size:9px;font-weight:700;color:var(--primary-light);font-family:monospace;margin-bottom:4px}
+    .sop-name{font-size:11px;font-weight:600;margin-bottom:3px}
+    .sop-owner{font-size:10px;color:var(--muted)}
+
+    /* DASHBOARD GESTAO A VISTA */
+    .gav-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+    @media(max-width:900px){.gav-grid{grid-template-columns:repeat(2,1fr)}}
+    .gav-tile{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+    .gav-icon{font-size:24px;margin-bottom:6px}
+    .gav-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .gav-val{font-size:26px;font-weight:800}
+    .gav-sub{font-size:11px;color:var(--muted2);margin-top:2px}
+
+    /* ALERTS */
+    .alert-list{display:flex;flex-direction:column;gap:8px}
+    .alert-item{background:var(--bg-card);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;border-left:3px solid transparent}
+    .alert-item.crit{border-color:var(--danger)}
+    .alert-item.warn{border-color:var(--warning)}
+    .alert-item.ok{border-color:var(--success-light)}
+    .alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .alert-dot.crit{background:var(--danger-light)}
+    .alert-dot.warn{background:var(--warning-light)}
+    .alert-dot.ok{background:var(--success-light)}
+    .alert-text{font-size:12px;flex:1}
+    .alert-unit{font-weight:700;color:var(--text)}
+    .alert-time{font-size:10px;color:var(--muted);white-space:nowrap}
+
+    /* FOOTER */
+    footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;margin-top:60px}
+    footer a{color:var(--primary-light);text-decoration:none}
+
+    /* ANIMATIONS */
+    .fade-in{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+    .fade-in.visible{opacity:1;transform:none}
+    .progress-bar{width:0;transition:width 1.2s ease}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="../" class="nav-logo">Frank<span> AI</span> OS</a>
+  <a href="#rules" class="nav-link">CEO Rules</a>
+  <a href="#setores" class="nav-link">Setores</a>
+  <a href="#ranking" class="nav-link">Ranking</a>
+  <a href="#gav" class="nav-link">Gestão à Vista</a>
+  <a href="#cadencia" class="nav-link">Cadência</a>
+  <a href="#pa" class="nav-link">Planos de Ação</a>
+  <a href="#sops" class="nav-link">SOPs</a>
+  <a href="#corretivos" class="nav-link">Corretivos</a>
+  <span class="nav-badge">2 alertas críticos</span>
+</nav>
+
+<div class="wrapper">
+
+  <!-- PAGE TITLE -->
+  <div class="page-title">
+    <h1>Sistema de Gestão <span>CEO</span></h1>
+    <p>Davvero Gelato · Frank AI OS · Todos os setores · 9 diretores em paralelo · 2026-04-25</p>
+  </div>
+
+  <!-- ─── CEO RULES ─────────────────────────────────────────────────── -->
+  <section class="section fade-in" id="rules">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(224,36,36,.15)">⚖️</div>
+      <h2>CEO Hard Rules — Inegociáveis</h2>
+    </div>
+    <div class="rules-strip">
+      <div class="rule-card ok">
+        <div class="rule-status">✅</div>
+        <div class="rule-label">CMV Rede</div>
+        <div class="rule-value ok">24,8%</div>
+        <div class="rule-limit">Limite máximo: 30%</div>
+        <div class="rule-bar"><div class="rule-fill ok progress-bar" data-w="83"></div></div>
+      </div>
+      <div class="rule-card ok">
+        <div class="rule-status">✅</div>
+        <div class="rule-label">EBITDA Rede</div>
+        <div class="rule-value ok">16,4%</div>
+        <div class="rule-limit">Mínimo exigido: 10%</div>
+        <div class="rule-bar"><div class="rule-fill ok progress-bar" data-w="100"></div></div>
+      </div>
+      <div class="rule-card ok">
+        <div class="rule-status">✅</div>
+        <div class="rule-label">Aluguel Médio</div>
+        <div class="rule-value ok">10,2%</div>
+        <div class="rule-limit">Limite máximo: 12%</div>
+        <div class="rule-bar"><div class="rule-fill ok progress-bar" data-w="85"></div></div>
+      </div>
+      <div class="rule-card ok">
+        <div class="rule-status">✅</div>
+        <div class="rule-label">Payback Médio</div>
+        <div class="rule-value ok">22 meses</div>
+        <div class="rule-limit">Limite máximo: 30 meses</div>
+        <div class="rule-bar"><div class="rule-fill ok progress-bar" data-w="73"></div></div>
+      </div>
+      <div class="rule-card crit">
+        <div class="rule-status">🔴</div>
+        <div class="rule-label">DVR-SP-004 CMV</div>
+        <div class="rule-value crit">31,4%</div>
+        <div class="rule-limit">Limite máximo: 30% · VIOLADO</div>
+        <div class="rule-bar"><div class="rule-fill crit progress-bar" data-w="100"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SETORES ───────────────────────────────────────────────────── -->
+  <section class="section fade-in" id="setores">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(26,86,219,.15)">🏢</div>
+      <h2>Setores — Metas, Indicadores & Controles</h2>
+    </div>
+
+    <div class="sector-tabs" id="sectorTabs">
+      <button class="sector-tab active" onclick="showSector('cfo')">💰 CFO</button>
+      <button class="sector-tab" onclick="showSector('coo')">⚙️ COO</button>
+      <button class="sector-tab" onclick="showSector('cmo')">📣 CMO</button>
+      <button class="sector-tab" onclick="showSector('legal')">⚖️ Legal</button>
+      <button class="sector-tab" onclick="showSector('rh')">👥 RH</button>
+      <button class="sector-tab" onclick="showSector('cso')">🗺️ CSO</button>
+      <button class="sector-tab" onclick="showSector('supply')">📦 Supply</button>
+      <button class="sector-tab" onclick="showSector('bi')">🧠 BI</button>
+      <button class="sector-tab" onclick="showSector('impl')">🏗️ Impl.</button>
+    </div>
+
+    <!-- CFO -->
+    <div class="sector-panel active" id="panel-cfo">
+      <div class="sector-grid">
+        <div class="sector-card">
+          <h3>💰 Metas CFO 2026</h3>
+          <div class="kpi-row"><span class="kpi-name">CMV rede</span><span class="kpi-val">Meta: 24% <span class="badge badge-ok">✅ 24,8%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">EBITDA médio</span><span class="kpi-val">Meta: 18% <span class="badge badge-warn">⚠️ 16,4%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Receita/unidade</span><span class="kpi-val">Meta: R$85k <span class="badge badge-ok">✅ R$80k</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Inadimplência royalties</span><span class="kpi-val">Meta: 0% <span class="badge badge-ok">✅ 0%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Cobertura de caixa</span><span class="kpi-val">Meta: +60d <span class="badge badge-ok">✅ 65d</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>📊 KPIs Monitorados</h3>
+          <div class="kpi-row"><span class="kpi-name">CMV%</span><span class="kpi-val">Diário <span class="badge badge-info">ERP Sults</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">EBITDA%</span><span class="kpi-val">Mensal <span class="badge badge-info">DRE</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Ticket médio</span><span class="kpi-val">Diário <span class="badge badge-info">POS</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">ROI acumulado</span><span class="kpi-val">Trimestral <span class="badge badge-info">CFO</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Receita/m²</span><span class="kpi-val">Mensal <span class="badge badge-info">CFO</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>🚨 Gatilhos Corretivos</h3>
+          <div class="kpi-row"><span class="kpi-name">CMV > 30%</span><span class="kpi-val"><span class="badge badge-crit">🔴 Auditoria 24h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">CMV 28-30%</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Diagnóstico 72h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">EBITDA < 10%</span><span class="kpi-val"><span class="badge badge-crit">🔴 Revisão DRE 48h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Royalties atraso 15d</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Notificação 48h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Receita < R$50k</span><span class="kpi-val"><span class="badge badge-crit">🔴 Plano emergência</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COO -->
+    <div class="sector-panel" id="panel-coo">
+      <div class="sector-grid">
+        <div class="sector-card">
+          <h3>⚙️ Metas COO 2026</h3>
+          <div class="kpi-row"><span class="kpi-name">NPS rede</span><span class="kpi-val">Meta: 78 <span class="badge badge-ok">✅ 72 média</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Auditoria qualidade</span><span class="kpi-val">Meta: 88/100 <span class="badge badge-warn">⚠️ 82</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Throughput</span><span class="kpi-val">Meta: 42/h <span class="badge badge-ok">✅ 38/h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Tempo atendimento</span><span class="kpi-val">Meta: 2,5min <span class="badge badge-ok">✅ 2,8min</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Desperdício</span><span class="kpi-val">Meta: 2,5% <span class="badge badge-warn">⚠️ 3,2%</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>📋 Auditoria 100pts — Categorias</h3>
+          <div class="kpi-row"><span class="kpi-name">Segurança alimentar</span><span class="kpi-val">25pts <span class="badge badge-info">ANVISA</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Padrão visual da loja</span><span class="kpi-val">20pts <span class="badge badge-info">Brand</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Qualidade do produto</span><span class="kpi-val">20pts <span class="badge badge-info">COO</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Atendimento ao cliente</span><span class="kpi-val">20pts <span class="badge badge-info">CX</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Processos administrativos</span><span class="kpi-val">15pts <span class="badge badge-info">Oper.</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>🚨 Gatilhos COO</h3>
+          <div class="kpi-row"><span class="kpi-name">NPS < 50</span><span class="kpi-val"><span class="badge badge-crit">🔴 Visita 48h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Temperatura fora spec</span><span class="kpi-val"><span class="badge badge-crit">🔴 Imediato</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Auditoria < 75pts</span><span class="kpi-val"><span class="badge badge-crit">🔴 Plano 7 dias</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Desperdício > 5%</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Treinamento 5d</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Fechamento irregular</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Notificação 24h</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CMO -->
+    <div class="sector-panel" id="panel-cmo">
+      <div class="sector-grid">
+        <div class="sector-card">
+          <h3>📣 Metas CMO 2026</h3>
+          <div class="kpi-row"><span class="kpi-name">ROAS Meta Ads</span><span class="kpi-val">Meta: 3,8x <span class="badge badge-warn">⚠️ 3,1x</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">CPA</span><span class="kpi-val">Meta: R$20 <span class="badge badge-ok">✅ R$24</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Engajamento IG</span><span class="kpi-val">Meta: 4,5% <span class="badge badge-warn">⚠️ 3,2%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Leads B2B/mês</span><span class="kpi-val">Meta: 12 <span class="badge badge-ok">✅ 9</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Conversão lead→contrato</span><span class="kpi-val">Meta: 12% <span class="badge badge-warn">⚠️ 8%</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>📅 Flywheel B2C — Operação</h3>
+          <div class="kpi-row"><span class="kpi-name">Attract (conteúdo orgânico)</span><span class="kpi-val"><span class="badge badge-info">3x/semana</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Engage (comunidade)</span><span class="kpi-val"><span class="badge badge-info">Diário &lt; 2h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Delight (oferta exclusiva)</span><span class="kpi-val"><span class="badge badge-info">Mensal</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Advocate (embaixadores)</span><span class="kpi-val"><span class="badge badge-info">Contínuo</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Meta Ads (campanhas ativas)</span><span class="kpi-val"><span class="badge badge-ok">✅ 3 campanhas</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>🚨 Gatilhos CMO</h3>
+          <div class="kpi-row"><span class="kpi-name">ROAS < 2,5x por 3 dias</span><span class="kpi-val"><span class="badge badge-crit">🔴 Pausar adset 24h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">CPA > R$40</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Revisar seg. 48h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Engaj. queda > 30%</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Análise 72h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Comentário neg. viral</span><span class="kpi-val"><span class="badge badge-crit">🔴 Crise CMO 1h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Leads B2B < 2/semana</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Revisão LinkedIn</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEGAL -->
+    <div class="sector-panel" id="panel-legal">
+      <div class="sector-grid">
+        <div class="sector-card">
+          <h3>⚖️ Metas Legal 2026</h3>
+          <div class="kpi-row"><span class="kpi-name">COF atualizado</span><span class="kpi-val"><span class="badge badge-ok">✅ 2025 vigente</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Contratos regularizados</span><span class="kpi-val">Meta: 100% <span class="badge badge-ok">✅ 100%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Certidões negativas</span><span class="kpi-val"><span class="badge badge-ok">✅ Todas em dia</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">INPI marca registrada</span><span class="kpi-val"><span class="badge badge-ok">✅ Registrado</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Processos trabalhistas</span><span class="kpi-val">Meta: &lt;3/ano <span class="badge badge-ok">✅ 1 ativo</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>📅 Calendário Legal Anual</h3>
+          <div class="kpi-row"><span class="kpi-name">Jan</span><span class="kpi-val">Revisão COF + atualização</span></div>
+          <div class="kpi-row"><span class="kpi-name">Mar</span><span class="kpi-val">Renovação de alvarás</span></div>
+          <div class="kpi-row"><span class="kpi-name">Jun</span><span class="kpi-val">Auditoria LGPD</span></div>
+          <div class="kpi-row"><span class="kpi-name">Set</span><span class="kpi-val">Renovação contratos</span></div>
+          <div class="kpi-row"><span class="kpi-name">Nov</span><span class="kpi-val">Planejamento tributário</span></div>
+        </div>
+        <div class="sector-card">
+          <h3>🚨 Gatilhos Legal</h3>
+          <div class="kpi-row"><span class="kpi-name">Embargo ANVISA</span><span class="kpi-val"><span class="badge badge-crit">🔴 Suspensão imediata</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Processo trabalhista</span><span class="kpi-val"><span class="badge badge-crit">🔴 Notif. CEO 24h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">COF desatualizado</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Atualiz. 30d</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Franqueado sem registro</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Notif. formal 15d</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RH -->
+    <div class="sector-panel" id="panel-rh">
+      <div class="sector-grid">
+        <div class="sector-card">
+          <h3>👥 Metas RH 2026</h3>
+          <div class="kpi-row"><span class="kpi-name">Turnover mensal</span><span class="kpi-val">Meta: 4% <span class="badge badge-ok">✅ 4,8%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">eNPS colaboradores</span><span class="kpi-val">Meta: 45 <span class="badge badge-warn">⚠️ 32</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">% cert. Davvero Academy</span><span class="kpi-val">Meta: 100% <span class="badge badge-warn">⚠️ 88%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Tempo contratação</span><span class="kpi-val">Meta: 8d <span class="badge badge-ok">✅ 11d</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Absenteísmo</span><span class="kpi-val">Meta: 1,8% <span class="badge badge-ok">✅ 2,1%</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>📋 Onboarding 21 dias</h3>
+          <div class="kpi-row"><span class="kpi-name">D1-3</span><span class="kpi-val">Cultura Davvero + CEO Rules</span></div>
+          <div class="kpi-row"><span class="kpi-name">D4-7</span><span class="kpi-val">Treinamento de produto</span></div>
+          <div class="kpi-row"><span class="kpi-name">D8-14</span><span class="kpi-val">SOPs + equipamentos + caixa</span></div>
+          <div class="kpi-row"><span class="kpi-name">D15-21</span><span class="kpi-val">Shadowing + prática supervisionada</span></div>
+          <div class="kpi-row"><span class="kpi-name">D21</span><span class="kpi-val">Certificação Academy (≥80%)</span></div>
+        </div>
+        <div class="sector-card">
+          <h3>🚨 Gatilhos RH</h3>
+          <div class="kpi-row"><span class="kpi-name">Turnover > 8%</span><span class="kpi-val"><span class="badge badge-crit">🔴 Diagnóstico 7d</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">eNPS < 20</span><span class="kpi-val"><span class="badge badge-crit">🔴 Workshop 15d</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Absenteísmo > 5%</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Conversa 48h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Headcount < 3</span><span class="kpi-val"><span class="badge badge-crit">🔴 Contrat. emerg.</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">% certif. < 80%</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Treinamento forçado</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CSO -->
+    <div class="sector-panel" id="panel-cso">
+      <div class="sector-grid">
+        <div class="sector-card">
+          <h3>🗺️ Metas CSO 2026</h3>
+          <div class="kpi-row"><span class="kpi-name">Novas unidades</span><span class="kpi-val">Meta: 3 <span class="badge badge-warn">⚠️ 1 em prog.</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Pipeline qualificados</span><span class="kpi-val">Meta: 15/mês <span class="badge badge-warn">⚠️ 9/mês</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Taxa conversão</span><span class="kpi-val">Meta: 12% <span class="badge badge-warn">⚠️ 8%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Tempo lead→abertura</span><span class="kpi-val">Meta: 6m <span class="badge badge-ok">✅ 5,5m</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Custo aquisição franqueado</span><span class="kpi-val">Meta: &lt;R$12k <span class="badge badge-ok">✅ R$9k</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>📊 Scorecard GO/NO-GO</h3>
+          <div class="kpi-row"><span class="kpi-name">Viabilidade financeira</span><span class="kpi-val">35% peso <span class="badge badge-info">CFO</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Análise de mercado</span><span class="kpi-val">25% peso <span class="badge badge-info">CSO</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Compliance legal</span><span class="kpi-val">20% peso <span class="badge badge-info">Legal</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Supply chain</span><span class="kpi-val">20% peso <span class="badge badge-info">Supply</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Mínimo GO</span><span class="kpi-val">≥ 70 pts <span class="badge badge-ok">✅</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>🚨 Gatilhos CSO</h3>
+          <div class="kpi-row"><span class="kpi-name">Score GO/NO-GO < 65</span><span class="kpi-val"><span class="badge badge-crit">❌ NO-GO imediato</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Leads < 3/semana</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Rev. canal geração</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Pipeline < 8/mês</span><span class="kpi-val"><span class="badge badge-crit">🔴 Ação mktg B2B</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">NPS franqueado < 60</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Rev. onboarding</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPPLY -->
+    <div class="sector-panel" id="panel-supply">
+      <div class="sector-grid">
+        <div class="sector-card">
+          <h3>📦 Metas Supply 2026</h3>
+          <div class="kpi-row"><span class="kpi-name">Fill rate</span><span class="kpi-val">Meta: 98% <span class="badge badge-ok">✅ 96,4%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Giro de estoque</span><span class="kpi-val">Meta: 14x/ano <span class="badge badge-ok">✅ 13x</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Desperdício insumos</span><span class="kpi-val">Meta: 1,8% <span class="badge badge-warn">⚠️ 2,9%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Lead time médio</span><span class="kpi-val">Meta: 1,5d <span class="badge badge-ok">✅ 1,8d</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Score fornecedores</span><span class="kpi-val">Meta: 88 <span class="badge badge-ok">✅ 84</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>📋 Ciclo de Controle</h3>
+          <div class="kpi-row"><span class="kpi-name">Inventário gelato</span><span class="kpi-val"><span class="badge badge-info">Diário</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Inventário insumos</span><span class="kpi-val"><span class="badge badge-info">Semanal</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Inventário completo</span><span class="kpi-val"><span class="badge badge-info">Mensal</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Avaliação fornecedores</span><span class="kpi-val"><span class="badge badge-info">Trimestral</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Revisão fichas técnicas</span><span class="kpi-val"><span class="badge badge-info">Mensal</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>🚨 Gatilhos Supply</h3>
+          <div class="kpi-row"><span class="kpi-name">Ruptura de gelato</span><span class="kpi-val"><span class="badge badge-crit">🔴 Pedido emerg. 2h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Temperatura fora spec</span><span class="kpi-val"><span class="badge badge-crit">🔴 Recusa imediata</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Fill rate < 90%</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Reunião forn. 48h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Score forn. < 65</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Prazo melhoria 60d</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">CMV vs. ficha > 8%</span><span class="kpi-val"><span class="badge badge-crit">🔴 Auditoria 24h</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BI -->
+    <div class="sector-panel" id="panel-bi">
+      <div class="sector-grid">
+        <div class="sector-card">
+          <h3>🧠 Metas BI 2026</h3>
+          <div class="kpi-row"><span class="kpi-name">Uptime dashboard</span><span class="kpi-val">Meta: 99,5% <span class="badge badge-ok">✅ 99,8%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Latência alertas</span><span class="kpi-val">Meta: &lt;5min <span class="badge badge-ok">✅ 2,3min</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Forecast MAPE</span><span class="kpi-val">Meta: &lt;15% <span class="badge badge-ok">✅ 11,2%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Anomalias proativas</span><span class="kpi-val">Meta: 90% <span class="badge badge-ok">✅ 87%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Insights acionáveis/mês</span><span class="kpi-val">Meta: 5 <span class="badge badge-ok">✅ 7</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>📊 Pipeline de Dados</h3>
+          <div class="kpi-row"><span class="kpi-name">ERP Sults (vendas/CMV)</span><span class="kpi-val"><span class="badge badge-info">Near-realtime</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Meta Ads API</span><span class="kpi-val"><span class="badge badge-info">Diário</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">NPS sistema</span><span class="kpi-val"><span class="badge badge-info">Imediato</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Google Analytics</span><span class="kpi-val"><span class="badge badge-info">Diário</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Forecast 30/60/90d</span><span class="kpi-val"><span class="badge badge-info">Rolling</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>🔮 Forecast Exemplo — DVR-SP-001</h3>
+          <div class="kpi-row"><span class="kpi-name">Receita projetada 30d</span><span class="kpi-val">R$92.400 ±8%</span></div>
+          <div class="kpi-row"><span class="kpi-name">CMV projetado</span><span class="kpi-val"><span class="badge badge-ok">24,1%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">EBITDA projetado</span><span class="kpi-val"><span class="badge badge-ok">19,2%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Risco</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Carnaval -18%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Oportunidade</span><span class="kpi-val"><span class="badge badge-ok">🌡️ Calor +22%</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPL -->
+    <div class="sector-panel" id="panel-impl">
+      <div class="sector-grid">
+        <div class="sector-card">
+          <h3>🏗️ Metas Impl. 2026</h3>
+          <div class="kpi-row"><span class="kpi-name">Abertura no prazo</span><span class="kpi-val">Meta: 100% <span class="badge badge-ok">✅ 100%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">GO-LIVE checklist</span><span class="kpi-val">Meta: 100/100 <span class="badge badge-ok">✅</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Custo vs. orçado</span><span class="kpi-val">Meta: ±10% <span class="badge badge-ok">✅ +6%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Receita mês 1</span><span class="kpi-val">Meta: 80% proj. <span class="badge badge-warn">⚠️ 72%</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">NPS franqueado D+30</span><span class="kpi-val">Meta: 70 <span class="badge badge-ok">✅ 74</span></span></div>
+        </div>
+        <div class="sector-card">
+          <h3>📅 Cronograma 14 Semanas</h3>
+          <div class="kpi-row"><span class="kpi-name">S1-2</span><span class="kpi-val">Projeto + aprovações</span></div>
+          <div class="kpi-row"><span class="kpi-name">S3-7</span><span class="kpi-val">Obra civil + acabamentos</span></div>
+          <div class="kpi-row"><span class="kpi-name">S8-9</span><span class="kpi-val">Equipamentos + instalação</span></div>
+          <div class="kpi-row"><span class="kpi-name">S10-11</span><span class="kpi-val">TI + ERP + PDV</span></div>
+          <div class="kpi-row"><span class="kpi-name">S12-14</span><span class="kpi-val">Treinamento + pré-op. + GO-LIVE</span></div>
+        </div>
+        <div class="sector-card">
+          <h3>🚨 Gatilhos Impl.</h3>
+          <div class="kpi-row"><span class="kpi-name">Atraso > 1 semana</span><span class="kpi-val"><span class="badge badge-crit">🔴 Reunião crise 24h</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Checklist < 85%</span><span class="kpi-val"><span class="badge badge-crit">🔴 Bloquear abertura</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Custo > 15% acima</span><span class="kpi-val"><span class="badge badge-crit">🔴 Autorização CEO</span></span></div>
+          <div class="kpi-row"><span class="kpi-name">Receita mês 1 < 60%</span><span class="kpi-val"><span class="badge badge-warn">⚠️ Plano recuperação</span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── RANKING ───────────────────────────────────────────────────── -->
+  <section class="section fade-in" id="ranking">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(245,158,11,.15)">🏆</div>
+      <h2>Ranking de Unidades — Abril 2026</h2>
+    </div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:auto">
+      <table class="ranking-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Unidade</th><th>Receita/mês</th><th>CMV%</th><th>EBITDA%</th><th>NPS</th><th>CEO Rules</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rank-num rank-1">1</span></td>
+            <td><strong>DVR-SP-003</strong><br/><span style="color:var(--muted);font-size:10px">São Paulo</span></td>
+            <td><strong>R$103.000</strong></td>
+            <td><span style="color:var(--success-light);font-weight:700">23,8%</span><br/>
+              <div class="bar-mini"><div class="bar-fill-ok" style="width:79%"></div></div></td>
+            <td><span style="color:var(--success-light);font-weight:700">21,4%</span></td>
+            <td><span style="color:var(--success-light);font-weight:700">78</span></td>
+            <td>5/5 ✅</td>
+            <td><span class="badge badge-ok">Excelente</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-num rank-2">2</span></td>
+            <td><strong>DVR-RJ-001</strong><br/><span style="color:var(--muted);font-size:10px">Rio de Janeiro</span></td>
+            <td><strong>R$94.000</strong></td>
+            <td><span style="color:var(--success-light);font-weight:700">25,9%</span><br/>
+              <div class="bar-mini"><div class="bar-fill-ok" style="width:86%"></div></div></td>
+            <td><span style="color:var(--success-light);font-weight:700">17,3%</span></td>
+            <td><span style="color:var(--success-light);font-weight:700">74</span></td>
+            <td>5/5 ✅</td>
+            <td><span class="badge badge-ok">Ótimo</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-num rank-3">3</span></td>
+            <td><strong>DVR-SP-001</strong><br/><span style="color:var(--muted);font-size:10px">São Paulo</span></td>
+            <td><strong>R$89.000</strong></td>
+            <td><span style="color:var(--success-light);font-weight:700">24,3%</span><br/>
+              <div class="bar-mini"><div class="bar-fill-ok" style="width:81%"></div></div></td>
+            <td><span style="color:var(--success-light);font-weight:700">18,7%</span></td>
+            <td><span style="color:var(--success-light);font-weight:700">72</span></td>
+            <td>5/5 ✅</td>
+            <td><span class="badge badge-ok">Ótimo</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-num rank-other">4</span></td>
+            <td><strong>DVR-SP-002</strong><br/><span style="color:var(--muted);font-size:10px">São Paulo</span></td>
+            <td>R$76.000</td>
+            <td><span style="color:var(--muted2);font-weight:700">27,1%</span><br/>
+              <div class="bar-mini"><div class="bar-fill-ok" style="width:90%"></div></div></td>
+            <td><span style="color:var(--muted2);font-weight:700">14,2%</span></td>
+            <td><span style="color:var(--muted2);font-weight:700">68</span></td>
+            <td>5/5 ✅</td>
+            <td><span class="badge badge-info">Estável</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-num rank-other">5</span></td>
+            <td><strong>DVR-RS-001</strong><br/><span style="color:var(--muted);font-size:10px">Porto Alegre</span></td>
+            <td>R$71.000</td>
+            <td><span style="color:var(--muted2);font-weight:700">26,2%</span><br/>
+              <div class="bar-mini"><div class="bar-fill-ok" style="width:87%"></div></div></td>
+            <td><span style="color:var(--muted2);font-weight:700">16,8%</span></td>
+            <td><span style="color:var(--muted2);font-weight:700">70</span></td>
+            <td>5/5 ✅</td>
+            <td><span class="badge badge-info">Estável</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-num rank-other">6</span></td>
+            <td><strong>DVR-MG-001</strong><br/><span style="color:var(--muted);font-size:10px">Belo Horizonte</span></td>
+            <td>R$68.000</td>
+            <td><span style="color:var(--warning-light);font-weight:700">28,7%</span><br/>
+              <div class="bar-mini"><div class="bar-fill-warn" style="width:96%"></div></div></td>
+            <td><span style="color:var(--warning-light);font-weight:700">13,1%</span></td>
+            <td><span style="color:var(--warning-light);font-weight:700">65</span></td>
+            <td>4/5 ⚠️</td>
+            <td><span class="badge badge-warn">Atenção</span></td>
+          </tr>
+          <tr>
+            <td><span class="rank-num rank-other">7</span></td>
+            <td><strong>DVR-SP-004</strong><br/><span style="color:var(--muted);font-size:10px">São Paulo</span></td>
+            <td>R$59.000</td>
+            <td><span style="color:var(--danger-light);font-weight:700">31,4%</span><br/>
+              <div class="bar-mini"><div class="bar-fill-crit" style="width:100%"></div></div></td>
+            <td><span style="color:var(--danger-light);font-weight:700">9,8%</span></td>
+            <td><span style="color:var(--danger-light);font-weight:700">61</span></td>
+            <td>3/5 🔴</td>
+            <td><span class="badge badge-crit">Crítico</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─── GESTÃO À VISTA ────────────────────────────────────────────── -->
+  <section class="section fade-in" id="gav">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(139,92,246,.15)">📊</div>
+      <h2>Gestão à Vista — Dashboard CEO</h2>
+    </div>
+    <div class="gav-grid">
+      <div class="gav-tile">
+        <div class="gav-icon">💰</div>
+        <div class="gav-label">Receita Rede (Mês)</div>
+        <div class="gav-val" style="color:var(--success-light)">R$560k</div>
+        <div class="gav-sub">7 unidades · Meta R$595k</div>
+      </div>
+      <div class="gav-tile">
+        <div class="gav-icon">📊</div>
+        <div class="gav-label">CMV Médio Rede</div>
+        <div class="gav-val" style="color:var(--success-light)">24,8%</div>
+        <div class="gav-sub">Limite ≤ 30% · ✅ OK</div>
+      </div>
+      <div class="gav-tile">
+        <div class="gav-icon">📈</div>
+        <div class="gav-label">EBITDA Médio</div>
+        <div class="gav-val" style="color:var(--warning-light)">16,4%</div>
+        <div class="gav-sub">Meta ≥ 18% · ⚠️ Atenção</div>
+      </div>
+      <div class="gav-tile">
+        <div class="gav-icon">😊</div>
+        <div class="gav-label">NPS Rede</div>
+        <div class="gav-val" style="color:var(--success-light)">70</div>
+        <div class="gav-sub">Meta 78 · Últimos 7 dias</div>
+      </div>
+      <div class="gav-tile">
+        <div class="gav-icon">🔴</div>
+        <div class="gav-label">Alertas Críticos</div>
+        <div class="gav-val" style="color:var(--danger-light)">2</div>
+        <div class="gav-sub">DVR-SP-004 · DVR-MG-001</div>
+      </div>
+      <div class="gav-tile">
+        <div class="gav-icon">📣</div>
+        <div class="gav-label">ROAS Meta Ads</div>
+        <div class="gav-val" style="color:var(--warning-light)">3,1x</div>
+        <div class="gav-sub">Meta 3,8x · ⚠️ Revisar</div>
+      </div>
+      <div class="gav-tile">
+        <div class="gav-icon">👥</div>
+        <div class="gav-label">Headcount Total</div>
+        <div class="gav-val" style="color:var(--text)">34</div>
+        <div class="gav-sub">5,1 média/unidade</div>
+      </div>
+      <div class="gav-tile">
+        <div class="gav-icon">🗺️</div>
+        <div class="gav-label">Pipeline Expansão</div>
+        <div class="gav-val" style="color:var(--accent-light)">9</div>
+        <div class="gav-sub">leads qualificados · 1 em impl.</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px">🚨 Alertas Ativos</div>
+        <div class="alert-list">
+          <div class="alert-item crit">
+            <div class="alert-dot crit"></div>
+            <div class="alert-text"><span class="alert-unit">DVR-SP-004</span> — CMV 31,4% viola CEO Rule R1 (limite 30%). EBITDA 9,8% abaixo do mínimo.</div>
+            <div class="alert-time">há 2h</div>
+          </div>
+          <div class="alert-item warn">
+            <div class="alert-dot warn"></div>
+            <div class="alert-text"><span class="alert-unit">DVR-MG-001</span> — NPS 65 abaixo do threshold de atenção (70). CMV 28,7% em tendência alta.</div>
+            <div class="alert-time">há 5h</div>
+          </div>
+          <div class="alert-item warn">
+            <div class="alert-dot warn"></div>
+            <div class="alert-text"><span class="alert-unit">Meta Ads</span> — ROAS 3,1x abaixo da meta 3,8x. Campanha Conversão com CPM elevado.</div>
+            <div class="alert-time">há 8h</div>
+          </div>
+          <div class="alert-item ok">
+            <div class="alert-dot ok"></div>
+            <div class="alert-text"><span class="alert-unit">DVR-SP-003</span> — Receita R$103k. Melhor unidade da rede em todos os KPIs.</div>
+            <div class="alert-time">hoje</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px">🎯 Foco do Mês — Abril 2026</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="background:rgba(224,36,36,.08);border:1px solid rgba(224,36,36,.2);border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--danger-light);margin-bottom:4px">🔴 PRIORIDADE 1</div>
+            <div style="font-size:12px;font-weight:600">DVR-SP-004 — Plano CMV</div>
+            <div style="font-size:11px;color:var(--muted2);margin-top:3px">Reduzir de 31,4% → 28% até 30/04 · PA-CMV-001</div>
+          </div>
+          <div style="background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.2);border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--warning-light);margin-bottom:4px">⚠️ PRIORIDADE 2</div>
+            <div style="font-size:12px;font-weight:600">DVR-MG-001 — Recuperação NPS</div>
+            <div style="font-size:11px;color:var(--muted2);margin-top:3px">Elevar NPS de 65 → 70 até 15/05 · PA-NPS-001</div>
+          </div>
+          <div style="background:rgba(26,86,219,.08);border:1px solid rgba(26,86,219,.2);border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--primary-light);margin-bottom:4px">🔵 PRIORIDADE 3</div>
+            <div style="font-size:12px;font-weight:600">Meta Ads — Otimização ROAS</div>
+            <div style="font-size:11px;color:var(--muted2);margin-top:3px">Elevar ROAS de 3,1x → 3,8x até 30/04 · CMO</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CADÊNCIA ──────────────────────────────────────────────────── -->
+  <section class="section fade-in" id="cadencia">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(5,122,85,.15)">📅</div>
+      <h2>Cadência de Acompanhamentos</h2>
+    </div>
+    <div class="cadence-grid">
+      <div class="cadence-card">
+        <div class="cadence-freq daily">Diário</div>
+        <div class="cadence-title">Operação Frank AI</div>
+        <div class="cadence-item">07h00 Morning Briefing CEO</div>
+        <div class="cadence-item">08h30 Alertas críticos WhatsApp</div>
+        <div class="cadence-item">19h00 Evening Analysis desvios</div>
+        <div class="cadence-item">23h59 Sync ERP + fechamento caixa</div>
+        <div class="cadence-item">Contínuo monitoramento NPS</div>
+      </div>
+      <div class="cadence-card">
+        <div class="cadence-freq weekly">Semanal</div>
+        <div class="cadence-title">Review Executivo (2ª 08h)</div>
+        <div class="cadence-item">DRE parcial por unidade</div>
+        <div class="cadence-item">Top 3 + Bottom 3 performances</div>
+        <div class="cadence-item">Alertas abertos + planos em andamento</div>
+        <div class="cadence-item">3 prioridades da semana definidas</div>
+        <div class="cadence-item">Performance Meta Ads semanal</div>
+      </div>
+      <div class="cadence-card">
+        <div class="cadence-freq monthly">Mensal</div>
+        <div class="cadence-title">Consolidado CEO (dia 1-3)</div>
+        <div class="cadence-item">DRE consolidada + CEO Rules scorecard</div>
+        <div class="cadence-item">Revisão de todos planos de ação</div>
+        <div class="cadence-item">Metas próximo mês definidas</div>
+        <div class="cadence-item">Report individual ao franqueado</div>
+        <div class="cadence-item">Forecast 30/60/90 dias BI</div>
+      </div>
+      <div class="cadence-card">
+        <div class="cadence-freq quarterly">Trimestral</div>
+        <div class="cadence-title">OKR Review Estratégico</div>
+        <div class="cadence-item">Revisão estratégia + ajustes OKR</div>
+        <div class="cadence-item">Auditoria qualidade COO (100pts)</div>
+        <div class="cadence-item">Avaliação fornecedores Supply</div>
+        <div class="cadence-item">eNPS colaboradores RH</div>
+        <div class="cadence-item">Análise de expansão CSO</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PLANOS DE AÇÃO ────────────────────────────────────────────── -->
+  <section class="section fade-in" id="pa">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(245,158,11,.15)">📋</div>
+      <h2>Planos de Ação Ativos — 5W2H</h2>
+    </div>
+    <div class="pa-grid">
+      <div class="pa-card" style="border-color:rgba(224,36,36,.3)">
+        <div class="pa-header">
+          <div>
+            <div class="pa-code">PA-CMV-001</div>
+            <div class="pa-title">Redução CMV — DVR-SP-004</div>
+          </div>
+          <span class="badge badge-crit">🔴 Crítico</span>
+        </div>
+        <div class="pa-row"><div class="pa-key">WHAT</div><div class="pa-val">Reduzir CMV de 31,4% para ≤ 28% em 30 dias</div></div>
+        <div class="pa-row"><div class="pa-key">WHY</div><div class="pa-val">Violação CEO Rule R1 — CMV > 30% insustentável</div></div>
+        <div class="pa-row"><div class="pa-key">WHO</div><div class="pa-val">Gerente DVR-SP-004 + Supply Frank AI</div></div>
+        <div class="pa-row"><div class="pa-key">WHEN</div><div class="pa-val">Início: imediato · Meta: 30/04 · Review: 15/04</div></div>
+        <div class="pa-row"><div class="pa-key">HOW</div><div class="pa-val">Auditoria fichas técnicas → Inventário surpresa 3x/sem → Treinamento porcionamento → Revisão fornecedores</div></div>
+        <div class="pa-row"><div class="pa-key">HOW MUCH</div><div class="pa-val">R$800 (treinamento + auditoria)</div></div>
+        <div class="pa-progress">
+          <div class="pa-progress-label"><span>Progresso</span><span>40%</span></div>
+          <div class="pa-bar"><div class="pa-fill progress-bar" style="background:var(--danger-light)" data-w="40"></div></div>
+        </div>
+      </div>
+
+      <div class="pa-card" style="border-color:rgba(217,119,6,.3)">
+        <div class="pa-header">
+          <div>
+            <div class="pa-code">PA-NPS-001</div>
+            <div class="pa-title">Recuperação NPS — DVR-MG-001</div>
+          </div>
+          <span class="badge badge-warn">⚠️ Médio</span>
+        </div>
+        <div class="pa-row"><div class="pa-key">WHAT</div><div class="pa-val">Elevar NPS de 65 para ≥ 70 em 45 dias</div></div>
+        <div class="pa-row"><div class="pa-key">WHY</div><div class="pa-val">NPS abaixo do threshold — risco de perda de clientes</div></div>
+        <div class="pa-row"><div class="pa-key">WHO</div><div class="pa-val">Gerente DVR-MG-001 + COO Frank AI</div></div>
+        <div class="pa-row"><div class="pa-key">WHEN</div><div class="pa-val">Início: 01/04 · Meta: 15/05 · Review: 01/05</div></div>
+        <div class="pa-row"><div class="pa-key">HOW</div><div class="pa-val">Análise verbatins → Treinamento atendimento → Protocolo recuperação → Mystery shopper mensal</div></div>
+        <div class="pa-row"><div class="pa-key">HOW MUCH</div><div class="pa-val">R$500 (treinamento + mystery shopper)</div></div>
+        <div class="pa-progress">
+          <div class="pa-progress-label"><span>Progresso</span><span>65%</span></div>
+          <div class="pa-bar"><div class="pa-fill progress-bar" style="background:var(--warning-light)" data-w="65"></div></div>
+        </div>
+      </div>
+
+      <div class="pa-card" style="border-color:rgba(26,86,219,.3)">
+        <div class="pa-header">
+          <div>
+            <div class="pa-code">PA-MKT-001</div>
+            <div class="pa-title">Otimização ROAS — Meta Ads</div>
+          </div>
+          <span class="badge badge-info">🔵 Baixo</span>
+        </div>
+        <div class="pa-row"><div class="pa-key">WHAT</div><div class="pa-val">Elevar ROAS de 3,1x para 3,8x em 30 dias</div></div>
+        <div class="pa-row"><div class="pa-key">WHY</div><div class="pa-val">ROAS abaixo da meta — budget de R$25k/mês sub-otimizado</div></div>
+        <div class="pa-row"><div class="pa-key">WHO</div><div class="pa-val">CMO Frank AI + Agência parceira</div></div>
+        <div class="pa-row"><div class="pa-key">WHEN</div><div class="pa-val">Início: 22/04 · Meta: 30/04 · Review: 26/04</div></div>
+        <div class="pa-row"><div class="pa-key">HOW</div><div class="pa-val">Pausar adsets ROAS < 2x → Testar 3 novos criativos → Ajustar segmentação raio → Lookalike 2% compradores</div></div>
+        <div class="pa-row"><div class="pa-key">HOW MUCH</div><div class="pa-val">Zero (reorientação do budget existente)</div></div>
+        <div class="pa-progress">
+          <div class="pa-progress-label"><span>Progresso</span><span>20%</span></div>
+          <div class="pa-bar"><div class="pa-fill progress-bar" style="background:var(--primary-light)" data-w="20"></div></div>
+        </div>
+      </div>
+
+      <div class="pa-card" style="border-color:rgba(139,92,246,.3)">
+        <div class="pa-header">
+          <div>
+            <div class="pa-code">PA-RH-001</div>
+            <div class="pa-title">Certificação Davvero Academy</div>
+          </div>
+          <span class="badge badge-warn">⚠️ Médio</span>
+        </div>
+        <div class="pa-row"><div class="pa-key">WHAT</div><div class="pa-val">Elevar certificação de 88% para 100% em 60 dias</div></div>
+        <div class="pa-row"><div class="pa-key">WHY</div><div class="pa-val">Equipe sem certificação impacta qualidade e NPS</div></div>
+        <div class="pa-row"><div class="pa-key">WHO</div><div class="pa-val">RH Frank AI + Gerentes de unidade</div></div>
+        <div class="pa-row"><div class="pa-key">WHEN</div><div class="pa-val">Início: 01/04 · Meta: 01/06 · Review: 01/05</div></div>
+        <div class="pa-row"><div class="pa-key">HOW</div><div class="pa-val">Mapear não certificados → Agendar módulos online → Prova de certificação → Reforço para reprovados</div></div>
+        <div class="pa-row"><div class="pa-key">HOW MUCH</div><div class="pa-val">R$300 (materiais de apoio)</div></div>
+        <div class="pa-progress">
+          <div class="pa-progress-label"><span>Progresso</span><span>45%</span></div>
+          <div class="pa-bar"><div class="pa-fill progress-bar" style="background:var(--accent-light)" data-w="45"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SOPs ──────────────────────────────────────────────────────── -->
+  <section class="section fade-in" id="sops">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(5,122,85,.15)">📁</div>
+      <h2>SOPs — Procedimentos Operacionais Padrão</h2>
+    </div>
+    <div class="sop-grid">
+      <div class="sop-item"><div class="sop-code">SOP-FIN-001</div><div class="sop-name">Fechamento de caixa diário</div><div class="sop-owner">CFO · Diário 23h59</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-FIN-002</div><div class="sop-name">Conciliação bancária semanal</div><div class="sop-owner">CFO · 2ª feira</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-FIN-003</div><div class="sop-name">DRE enviada ao sistema</div><div class="sop-owner">CFO · Dia 3 do mês</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-FIN-004</div><div class="sop-name">Compras acima de R$2.000</div><div class="sop-owner">CFO · 3 orçamentos</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-FIN-005</div><div class="sop-name">Pagamento de royalties</div><div class="sop-owner">CFO · Dia 10/mês</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-OPS-001</div><div class="sop-name">Checklist abertura/fechamento</div><div class="sop-owner">COO · Diário</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-OPS-002</div><div class="sop-name">Temperatura e armazenamento</div><div class="sop-owner">COO · 3x/dia</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-OPS-003</div><div class="sop-name">Atendimento ao cliente</div><div class="sop-owner">COO · Sempre</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-OPS-004</div><div class="sop-name">Higienização de equipamentos</div><div class="sop-owner">COO · ANVISA</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-OPS-005</div><div class="sop-name">Gestão de desperdício</div><div class="sop-owner">COO · Semanal</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-MKT-001</div><div class="sop-name">Identidade visual e tom de voz</div><div class="sop-owner">CMO · Sempre</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-MKT-002</div><div class="sop-name">Calendário editorial mensal</div><div class="sop-owner">CMO · Dia 25/mês</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-MKT-003</div><div class="sop-name">Aprovação de conteúdo</div><div class="sop-owner">CMO · Por publicação</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-MKT-004</div><div class="sop-name">Protocolo de crise</div><div class="sop-owner">CMO · Max 1h resposta</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-LEG-001</div><div class="sop-name">Due diligence novo franqueado</div><div class="sop-owner">Legal · 30d pré-contrato</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-LEG-002</div><div class="sop-name">Entrega do COF</div><div class="sop-owner">Legal · 10d pré-assinatura</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-RH-001</div><div class="sop-name">Processo seletivo padrão</div><div class="sop-owner">RH · Por contratação</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-RH-002</div><div class="sop-name">Onboarding 21 dias</div><div class="sop-owner">RH · Toda admissão</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-SUP-001</div><div class="sop-name">Pedido padrão (ERP)</div><div class="sop-owner">Supply · Por pedido</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-SUP-002</div><div class="sop-name">Recebimento com temperatura</div><div class="sop-owner">Supply · Toda entrega</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-SUP-003</div><div class="sop-name">Armazenamento PEPS</div><div class="sop-owner">Supply · Sempre</div></div>
+      <div class="sop-item"><div class="sop-code">SOP-BI-001</div><div class="sop-name">Dicionário de dados (KPIs)</div><div class="sop-owner">BI · Fonte única da verdade</div></div>
+    </div>
+  </section>
+
+  <!-- ─── CORRETIVOS ────────────────────────────────────────────────── -->
+  <section class="section fade-in" id="corretivos">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(224,36,36,.15)">🚨</div>
+      <h2>Matriz de Escalonamento & Controles Corretivos</h2>
+    </div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:auto;margin-bottom:16px">
+      <table class="esc-table">
+        <thead>
+          <tr><th>Severidade</th><th>Critério</th><th>Notificação</th><th>Prazo resposta</th><th>Autoridade</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="esc-sev" style="color:var(--danger-light)">🔴 Crítico</div></td>
+            <td style="color:var(--muted2)">CEO Rule violada</td>
+            <td>CEO imediato (WhatsApp)</td>
+            <td><strong>2 horas</strong></td>
+            <td>CEO decide</td>
+          </tr>
+          <tr>
+            <td><div class="esc-sev" style="color:var(--warning-light)">⚠️ Alto</div></td>
+            <td style="color:var(--muted2)">KPI 10% abaixo da meta</td>
+            <td>Diretor + CEO (email)</td>
+            <td><strong>24 horas</strong></td>
+            <td>Diretor decide</td>
+          </tr>
+          <tr>
+            <td><div class="esc-sev" style="color:var(--warning-light)">🟡 Médio</div></td>
+            <td style="color:var(--muted2)">Tendência negativa 3 dias</td>
+            <td>Diretor (dashboard)</td>
+            <td><strong>72 horas</strong></td>
+            <td>Gerente executa</td>
+          </tr>
+          <tr>
+            <td><div class="esc-sev" style="color:var(--primary-light)">🔵 Baixo</div></td>
+            <td style="color:var(--muted2)">Oportunidade de melhoria</td>
+            <td>Relatório semanal</td>
+            <td><strong>7 dias</strong></td>
+            <td>Equipe executa</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px">⚡ Protocolo de Crise — CEO Rule Violada</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+        <div style="text-align:center;padding:14px;background:var(--bg-card2);border-radius:10px">
+          <div style="font-size:20px;margin-bottom:6px">🤖</div>
+          <div style="font-size:10px;font-weight:700;color:var(--danger-light);margin-bottom:4px">HORA 0</div>
+          <div style="font-size:11px;font-weight:600">Frank AI detecta</div>
+          <div style="font-size:10px;color:var(--muted2);margin-top:3px">Alerta WhatsApp + email imediato</div>
+        </div>
+        <div style="text-align:center;padding:14px;background:var(--bg-card2);border-radius:10px">
+          <div style="font-size:20px;margin-bottom:6px">👔</div>
+          <div style="font-size:10px;font-weight:700;color:var(--warning-light);margin-bottom:4px">HORA 0-2</div>
+          <div style="font-size:11px;font-weight:600">CEO avalia</div>
+          <div style="font-size:10px;color:var(--muted2);margin-top:3px">Abre 5W2H + designa responsável</div>
+        </div>
+        <div style="text-align:center;padding:14px;background:var(--bg-card2);border-radius:10px">
+          <div style="font-size:20px;margin-bottom:6px">🔍</div>
+          <div style="font-size:10px;font-weight:700;color:var(--primary-light);margin-bottom:4px">HORA 2-24</div>
+          <div style="font-size:11px;font-weight:600">Diagnóstico</div>
+          <div style="font-size:10px;color:var(--muted2);margin-top:3px">Frank AI causa-raiz + visita unidade</div>
+        </div>
+        <div style="text-align:center;padding:14px;background:var(--bg-card2);border-radius:10px">
+          <div style="font-size:20px;margin-bottom:6px">⚙️</div>
+          <div style="font-size:10px;font-weight:700;color:var(--accent-light);margin-bottom:4px">DIA 2-7</div>
+          <div style="font-size:11px;font-weight:600">Execução</div>
+          <div style="font-size:10px;color:var(--muted2);margin-top:3px">Check diário Frank AI · Report D+3 e D+7</div>
+        </div>
+        <div style="text-align:center;padding:14px;background:var(--bg-card2);border-radius:10px">
+          <div style="font-size:20px;margin-bottom:6px">✅</div>
+          <div style="font-size:10px;font-weight:700;color:var(--success-light);margin-bottom:4px">DIA 30</div>
+          <div style="font-size:11px;font-weight:600">Fechamento</div>
+          <div style="font-size:10px;color:var(--muted2);margin-top:3px">Meta atingida → Lição → SOP atualizado</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /wrapper -->
+
+<footer>
+  <p>Frank AI OS · Sistema de Gestão CEO · Davvero Gelato Franchising · 2026</p>
+  <p style="margin-top:6px">
+    <a href="../">← Landing Page</a> ·
+    <a href="../marketing/">📣 Estratégia de Marketing</a> ·
+    <a href="sistema-gestao-davvero.md">📄 Documento Completo</a>
+  </p>
+</footer>
+
+<script>
+  // SECTOR TABS
+  function showSector(id) {
+    document.querySelectorAll('.sector-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sector-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  // INTERSECTION OBSERVER — fade in
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // PROGRESS BARS
+  const barObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.progress-bar[data-w]').forEach(bar => {
+          bar.style.width = bar.dataset.w + '%';
+        });
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.section, .pa-card').forEach(el => barObs.observe(el));
+
+  // NAV ACTIVE
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) cur = s.id; });
+    document.querySelectorAll('nav a.nav-link').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+    });
+  });
+</script>
+</body>
+</html>
