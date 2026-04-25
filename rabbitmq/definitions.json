@@ -1,0 +1,116 @@
+{
+  "rabbit_version": "3.13.0",
+  "rabbitmq_version": "3.13.0",
+  "users": [
+    {
+      "name": "frank",
+      "password_hash": "",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ["administrator"],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {"name": "davvero"}
+  ],
+  "permissions": [
+    {
+      "user": "frank",
+      "vhost": "davvero",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "frank.direct",
+      "vhost": "davvero",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "frank.topic",
+      "vhost": "davvero",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "frank.deadletter",
+      "vhost": "davvero",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "frank_tasks",
+      "vhost": "davvero",
+      "durable": true,
+      "auto_delete": false,
+      "exclusive": false,
+      "arguments": {
+        "x-message-ttl": 86400000,
+        "x-dead-letter-exchange": "frank.deadletter",
+        "x-max-priority": 10
+      }
+    },
+    {
+      "name": "frank_alerts",
+      "vhost": "davvero",
+      "durable": true,
+      "auto_delete": false,
+      "exclusive": false,
+      "arguments": {
+        "x-message-ttl": 3600000,
+        "x-max-priority": 10
+      }
+    },
+    {
+      "name": "frank_reports",
+      "vhost": "davvero",
+      "durable": true,
+      "auto_delete": false,
+      "exclusive": false,
+      "arguments": {
+        "x-message-ttl": 86400000
+      }
+    },
+    {
+      "name": "frank_tasks.dlq",
+      "vhost": "davvero",
+      "durable": true,
+      "auto_delete": false,
+      "exclusive": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {"source": "frank.direct", "vhost": "davvero", "destination": "frank_tasks",   "destination_type": "queue", "routing_key": "tasks",   "arguments": {}},
+    {"source": "frank.direct", "vhost": "davvero", "destination": "frank_alerts",  "destination_type": "queue", "routing_key": "alerts",  "arguments": {}},
+    {"source": "frank.direct", "vhost": "davvero", "destination": "frank_reports", "destination_type": "queue", "routing_key": "reports", "arguments": {}},
+    {"source": "frank.deadletter", "vhost": "davvero", "destination": "frank_tasks.dlq", "destination_type": "queue", "routing_key": "frank_tasks", "arguments": {}}
+  ],
+  "policies": [
+    {
+      "vhost": "davvero",
+      "name": "ha-all",
+      "pattern": "frank.*",
+      "definition": {
+        "ha-mode": "all",
+        "ha-sync-mode": "automatic"
+      },
+      "priority": 0,
+      "apply-to": "all"
+    }
+  ]
+}
